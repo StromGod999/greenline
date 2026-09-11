@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+env/
+.venv/
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+/staticfiles/
+/media/
+
+# Env / secrets
+.env
+
+# Node / Expo (mobile app)
+mobile_app/node_modules/
+mobile_app/.expo/
+mobile_app/dist/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp

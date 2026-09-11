@@ -10,13 +10,14 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.db.models import Q, Count, Sum
 from django.core.paginator import Paginator
 from django.utils import timezone
+from django.utils.text import slugify
 from django.conf import settings
 
 from .models import (
     Product, Category, Brand, ProductSpecification, ProductImage,
     Cart, CartItem, Coupon, Order, OrderItem, Review, Wishlist
 )
-from .forms import CheckoutForm, ReviewForm, UserRegisterForm, ProductAdminForm
+from .forms import CheckoutForm, ReviewForm, UserRegisterForm
 from .utils import get_or_create_cart, create_razorpay_order, verify_razorpay_signature
 
 
@@ -721,8 +722,71 @@ def admin_dashboard_view(request):
         'recent_orders': recent_orders,
         'products': products,
         'order_status_choices': Order.ORDER_STATUS_CHOICES,
+        'brands': Brand.objects.all(),
+        'categories': Category.objects.all(),
     }
     return render(request, 'store/admin_dashboard.html', context)
+
+
+@user_passes_test(is_admin_or_staff, login_url='store:login')
+def admin_add_product(request):
+    """
+    Adds a brand-new smartphone (with its technical specification record)
+    straight from the Store Admin Dashboard inventory tab.
+    """
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        brand_id = request.POST.get('brand')
+        category_id = request.POST.get('category')
+        price = request.POST.get('price')
+        short_description = request.POST.get('short_description', '').strip()
+        description = request.POST.get('description', '').strip()
+
+        if not (name and brand_id and price and short_description and description):
+            messages.error(request, "Please fill in all required smartphone fields.")
+            return redirect(request.META.get('HTTP_REFERER', 'store:admin_dashboard'))
+
+        brand = get_object_or_404(Brand, id=brand_id)
+        category = Category.objects.filter(id=category_id).first() if category_id else None
+
+        discount_price = request.POST.get('discount_price') or None
+        stock = request.POST.get('stock') or 0
+
+        base_slug = slugify(f"{brand.name}-{name}")
+        slug = base_slug
+        suffix = 1
+        while Product.objects.filter(slug=slug).exists():
+            suffix += 1
+            slug = f"{base_slug}-{suffix}"
+
+        product = Product.objects.create(
+            name=name,
+            slug=slug,
+            brand=brand,
+            category=category,
+            price=Decimal(price),
+            discount_price=Decimal(discount_price) if discount_price else None,
+            stock=int(stock),
+            image_url=request.POST.get('image_url', '').strip() or None,
+            main_image=request.FILES.get('main_image'),
+            short_description=short_description,
+            description=description,
+            is_featured=bool(request.POST.get('is_featured')),
+            is_trending=bool(request.POST.get('is_trending')),
+            is_5g=bool(request.POST.get('is_5g')),
+        )
+
+        spec_kwargs = {}
+        if request.POST.get('ram'):
+            spec_kwargs['ram'] = request.POST.get('ram').strip()
+        if request.POST.get('storage'):
+            spec_kwargs['storage'] = request.POST.get('storage').strip()
+        ProductSpecification.objects.create(product=product, **spec_kwargs)
+
+        messages.success(request, f"✓ {product.name} was added to the catalog successfully!")
+        return redirect('store:admin_dashboard')
+
+    return redirect('store:admin_dashboard')
 
 
 @user_passes_test(is_admin_or_staff, login_url='store:login')

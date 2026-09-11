@@ -20,8 +20,8 @@ urlpatterns = [
 
     # Checkout & Razorpay Payment & Delivery Scheduling
     path('checkout/', views.checkout_view, name='checkout'),
-    path('payment/razorpay/<str:order_number>/', views.razorpay_payment_view, name='razorpay_payment'),
     path('payment/razorpay/callback/', views.razorpay_callback_view, name='razorpay_callback'),
+    path('payment/razorpay/<str:order_number>/', views.razorpay_payment_view, name='razorpay_payment'),
     path('order/success/<str:order_number>/', views.order_success_view, name='order_success'),
     path('order/track/<str:order_number>/', views.order_tracking_view, name='order_tracking'),
     path('order/invoice/<str:order_number>/', views.invoice_view, name='invoice'),
@@ -34,6 +34,7 @@ urlpatterns = [
     # Custom Admin Management & Order Schedule Dashboard
     path('admin-dashboard/', views.admin_dashboard_view, name='admin_dashboard'),
     path('admin-dashboard/order/<int:order_id>/update/', views.admin_update_order_status, name='admin_update_order_status'),
+    path('admin-dashboard/product/add/', views.admin_add_product, name='admin_add_product'),
     path('admin-dashboard/product/<int:product_id>/stock/', views.admin_update_product_stock, name='admin_update_product_stock'),
 
     # Authentication

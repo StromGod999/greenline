@@ -278,7 +278,114 @@
          ========================================================= -->
     <div class="tab-pane fade" id="tab-inventory" role="tabpanel">
       <div class="bg-white p-4 rounded-4 shadow-sm border" style="border-color: rgba(16, 185, 129, 0.2) !important;">
-        <h5 class="fw-bold text-dark mb-3">Quick Stock & Price Manager</h5>
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+          <h5 class="fw-bold text-dark mb-0">Quick Stock & Price Manager</h5>
+          <button type="button" class="btn btn-emerald rounded-pill btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
+            <i class="fa-solid fa-plus me-1"></i> Add New Smartphone
+          </button>
+        </div>
+
+        <!-- Add Product Modal -->
+        <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 border-0 shadow-lg">
+              <div class="modal-header text-white" style="background: #064E3B;">
+                <h6 class="modal-title fw-bold"><i class="fa-solid fa-mobile-screen-button me-2"></i>Add New Smartphone</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+              </div>
+              <form method="POST" action="{% url 'store:admin_add_product' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold">Phone Name</label>
+                      <input type="text" name="name" required class="form-control green-input" placeholder="e.g. Galaxy S25 Ultra">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold">Brand</label>
+                      <select name="brand" required class="form-select green-input">
+                        <option value="">Select Brand</option>
+                        {% for b in brands %}
+                          <option value="{{ b.id }}">{{ b.name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold">Category</label>
+                      <select name="category" class="form-select green-input">
+                        <option value="">Select Category</option>
+                        {% for c in categories %}
+                          <option value="{{ c.id }}">{{ c.name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label small fw-bold">Price (₹)</label>
+                      <input type="number" step="0.01" min="0" name="price" required class="form-control green-input" placeholder="79999">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label small fw-bold">Discount Price (₹)</label>
+                      <input type="number" step="0.01" min="0" name="discount_price" class="form-control green-input" placeholder="Optional">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label small fw-bold">Stock Quantity</label>
+                      <input type="number" min="0" name="stock" value="10" required class="form-control green-input">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label small fw-bold">RAM</label>
+                      <input type="text" name="ram" class="form-control green-input" placeholder="12 GB">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label small fw-bold">Storage</label>
+                      <input type="text" name="storage" class="form-control green-input" placeholder="256 GB">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold">Product Image URL</label>
+                      <input type="url" name="image_url" class="form-control green-input" placeholder="https://...">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold">Or Upload Image</label>
+                      <input type="file" name="main_image" accept="image/*" class="form-control green-input">
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label small fw-bold">Short Description</label>
+                      <input type="text" name="short_description" required maxlength="300" class="form-control green-input" placeholder="Highlight specs shown on listing cards">
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label small fw-bold">Full Description</label>
+                      <textarea name="description" required rows="3" class="form-control green-input" placeholder="Detailed product description..."></textarea>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-check form-switch mt-4">
+                        <input class="form-check-input" type="checkbox" name="is_featured" id="addIsFeatured">
+                        <label class="form-check-label small fw-bold" for="addIsFeatured">Featured</label>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-check form-switch mt-4">
+                        <input class="form-check-input" type="checkbox" name="is_trending" id="addIsTrending">
+                        <label class="form-check-label small fw-bold" for="addIsTrending">Trending</label>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-check form-switch mt-4">
+                        <input class="form-check-input" type="checkbox" name="is_5g" id="addIs5g" checked>
+                        <label class="form-check-label small fw-bold" for="addIs5g">5G Enabled</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer bg-light">
+                  <button type="button" class="btn btn-sm btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                  <button type="submit" class="btn btn-sm btn-emerald rounded-pill px-4">
+                    <i class="fa-solid fa-circle-plus me-1"></i> Add Smartphone
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
         <div class="table-responsive">
           <table class="table align-middle">
             <thead class="table-light">

@@ -8,7 +8,7 @@ echo   Cross-Platform: Android APK / Simulator ^& iOS
 echo ============================================================
 echo.
 
-cd /d "%~dp0mobile_app"
+cd /d "%~dp0..\mobile_app"
 
 echo [1/3] Checking Node.js and NPM...
 where npm >nul 2>nul

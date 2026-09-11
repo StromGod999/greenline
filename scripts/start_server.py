@@ -22,7 +22,7 @@ def main():
     print("     🌿 GreenPulse Online Mobile Store (Django 2026)")
     print("=" * 65)
 
-    base_dir = os.path.dirname(os.path.abspath(__file__))
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     os.chdir(base_dir)
 
     # 1. Database Migrations

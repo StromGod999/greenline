@@ -36,33 +36,44 @@ A flagship, modern **Online Mobile Store** built with **Python & Django**, desig
 - Secure checkout supporting **Razorpay Standard Checkout** as well as a high-fidelity **interactive test sandbox modal** (Cards, UPI / QR, Netbanking).
 - Support for Cash on Delivery (COD) and signature verification.
 
+### 6. 🛠️ Real PostgreSQL Backend + Two Admin Flows
+- Production-grade **PostgreSQL** database (works great with managed providers like Neon, Supabase, RDS) configured via a single `DATABASE_URL` env var — falls back to local SQLite automatically when unset.
+- **Store Admin Dashboard** (`/admin-dashboard/`): order dispatch & delivery schedule manager, quick stock/price editor, and an **Add New Smartphone** form (with technical spec fields) — no need to leave the storefront theme.
+- **Django Admin** (`/admin/`): full CRUD for every model (products, specs, gallery images, orders, coupons, reviews) for power users.
+
 ### 7. 📱 Cross-Platform Mobile App for Android & iOS (`mobile_app/`)
 - Native **Android APK** & **iOS** application built with React Native & Expo.
 - Complete feature parity: Flagship catalog, search, dedicated cart, promo coupons, doorstep delivery time slot scheduler, **Razorpay Payment Gateway** (UPI GPay/PhonePe, Cards, NetBanking), and live fulfillment timeline.
-- One-click launcher: Run `run_mobile_app.bat`.
+- One-click launcher: Run `scripts/run_mobile_app.bat`.
 
 ---
 
 ## 🚀 Quick Start Guide
 
-### Option 1: One-Click Windows Batch (Easiest)
-Double-click `run_server.bat` in the project folder. It will automatically apply migrations, populate sample smartphones, and start the development server.
+### 1. Configure environment variables
+Copy `.env.example` to `.env` and fill in your `DATABASE_URL` (PostgreSQL connection string) and Razorpay keys. Leaving `DATABASE_URL` unset uses local SQLite instead.
 
-### Option 2: Python Command Line
+### 2. Install dependencies
 ```bash
-# 1. Install dependencies
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
+```
 
-# 2. Run migrations
+### 3. Run migrations & seed sample data
+```bash
 python manage.py makemigrations store
 python manage.py migrate
-
-# 3. Seed initial smartphones, categories, brands, coupons, and admin
 python populate_db.py
+```
 
-# 4. Start the Django Server
+### 4. Start the Django server
+```bash
 python manage.py runserver 127.0.0.1:8000
 ```
+
+### Windows one-click alternative
+Double-click `scripts/run_server.bat` (or run `python scripts/start_server.py`) — it migrates, seeds, and launches the server automatically.
 
 ---
 
@@ -127,9 +138,27 @@ Store Of Mobile/
 │       ├── main.js           # AJAX cart, gallery switcher, toast triggers
 │       └── razorpay-checkout.js # Razorpay payment gateway script
 │
-├── populate_db.py            # Automatic seed script with 12+ real flagships
-├── requirements.txt          # Django, Pillow, razorpay
-├── run_server.bat            # Windows 1-click launcher
-├── start_server.py           # Python 1-click launcher
+├── scripts/                    # Launcher & utility scripts
+│   ├── run_server.bat         # Windows 1-click launcher
+│   ├── start_server.py        # Python 1-click launcher
+│   ├── run_mobile_app.bat     # Expo/React Native launcher
+│   ├── share_live.bat / .py   # Public tunnel link generator
+│
+├── mobile_app/                 # React Native (Expo) cross-platform app
+├── populate_db.py              # Automatic seed script with 12+ real flagships
+├── requirements.txt            # Django, Pillow, razorpay, psycopg2, dj-database-url, whitenoise, gunicorn
+├── .env.example                 # Environment variable template (DATABASE_URL, Razorpay keys)
 └── README.md
 ```
+
+---
+
+## 🗄️ Database Configuration
+
+The project reads a single `DATABASE_URL` environment variable (see `.env.example`). Point it at any PostgreSQL instance, for example a free [Neon](https://neon.tech) database:
+
+```
+DATABASE_URL=postgresql://user:password@host/dbname?sslmode=require
+```
+
+If `DATABASE_URL` is not set, the app automatically falls back to a local `db.sqlite3` file so you can develop offline without a Postgres server.
