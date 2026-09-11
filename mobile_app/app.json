@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "GreenPulse Mobiles India",
+    "slug": "greenpulse-mobiles",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#064E3B",
+      "resizeMode": "contain"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.greenpulse.mobilestore",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
+    },
+    "android": {
+      "package": "com.greenpulse.mobilestore",
+      "adaptiveIcon": {
+        "backgroundColor": "#064E3B"
+      },
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ]
+    }
+  }
+}

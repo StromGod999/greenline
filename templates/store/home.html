@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}GreenPulse - Premium 5G Smartphone Store{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- =========================================================
+       HERO BANNER SECTION
+       ========================================================= -->
+  <section class="gp-hero p-4 p-md-5 mb-5 green-texture-bg">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <div class="gp-hero-badge mb-3">
+          <i class="fa-solid fa-sparkles text-warning"></i> 2026 Next-Gen Flagships Available
+        </div>
+        <h1 class="display-4 fw-extrabold text-white mb-3" style="line-height: 1.15;">
+          Power Meets Elegance.<br>
+          <span style="background: linear-gradient(90deg, #34D399, #A7F3D0); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Next-Gen 5G Smartphones.
+          </span>
+        </h1>
+        <p class="lead text-emerald-100 mb-4" style="color: #D1FAE5; max-width: 540px; font-size: 1.1rem;">
+          Discover titanium designs, pro-grade 200MP camera systems, ultra-fast Snapdragon chips, and schedule your custom delivery slot with seamless <strong>Razorpay</strong> checkout.
+        </p>
+
+        <div class="d-flex flex-wrap gap-3 mb-4">
+          <a href="{% url 'store:product_list' %}" class="btn btn-emerald btn-lg px-4 py-3 shadow-lg">
+            <i class="fa-solid fa-bag-shopping me-2"></i> Shop Flagships
+          </a>
+          <a href="{% url 'store:product_list' %}?5g=1" class="btn btn-outline-light btn-lg px-4 py-3 rounded-4">
+            <i class="fa-solid fa-bolt text-emerald-400 me-2" style="color: #34D399;"></i> 5G Mobiles
+          </a>
+        </div>
+
+        <!-- Mini Value Props -->
+        <div class="row g-3 pt-3 border-top" style="border-color: rgba(255,255,255,0.15) !important;">
+          <div class="col-sm-4 d-flex align-items-center gap-2 text-white" style="font-size: 0.85rem;">
+            <i class="fa-solid fa-calendar-check text-emerald-300 fs-5" style="color: #6EE7B7;"></i>
+            <span>Scheduled Delivery Slots</span>
+          </div>
+          <div class="col-sm-4 d-flex align-items-center gap-2 text-white" style="font-size: 0.85rem;">
+            <i class="fa-solid fa-shield-check text-emerald-300 fs-5" style="color: #6EE7B7;"></i>
+            <span>Razorpay Secure Payments</span>
+          </div>
+          <div class="col-sm-4 d-flex align-items-center gap-2 text-white" style="font-size: 0.85rem;">
+            <i class="fa-solid fa-certificate text-emerald-300 fs-5" style="color: #6EE7B7;"></i>
+            <span>100% Brand Authentic</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5 text-center position-relative">
+        {% if spotlight_phone %}
+          <div class="position-relative d-inline-block">
+            <img src="{{ spotlight_phone.get_image_url }}" alt="{{ spotlight_phone.name }}" class="gp-hero-phone-img img-fluid">
+            <!-- Floating Highlight Badge -->
+            <div class="position-absolute bottom-0 start-0 bg-white p-3 rounded-4 shadow-lg text-start d-none d-sm-block" style="border: 1px solid rgba(16, 185, 129, 0.3); max-width: 220px;">
+              <span class="badge bg-emerald-100 text-emerald-800 fw-bold mb-1" style="background: #ECFDF5; color: #065F46;">🔥 Featured Flagship</span>
+              <h6 class="mb-1 fw-bold text-dark text-truncate">{{ spotlight_phone.name }}</h6>
+              <div class="text-success fw-bold">₹{{ spotlight_phone.get_current_price }}</div>
+            </div>
+          </div>
+        {% else %}
+          <img src="https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&auto=format&fit=crop&q=80" alt="Smartphone" class="gp-hero-phone-img img-fluid">
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       TOP BRANDS LOGOS STRIP
+       ========================================================= -->
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold mb-0"><i class="fa-solid fa-gem text-emerald-600 me-2" style="color: #10B981;"></i> Official Smartphone Brands</h4>
+      <a href="{% url 'store:product_list' %}" class="text-emerald-600 fw-semibold text-decoration-none" style="color: #059669;">
+        View All Brands <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">
+      {% for brand in brands %}
+        <div class="col">
+          <a href="{% url 'store:product_list' %}?brand={{ brand.slug }}" class="card text-center p-3 h-100 text-decoration-none border-0 shadow-sm rounded-4" style="background: #FFFFFF; border: 1.5px solid rgba(16, 185, 129, 0.15) !important; transition: transform 0.2s;">
+            <div class="mb-2" style="height: 50px; display: flex; align-items: center; justify-content: center;">
+              <img src="{{ brand.get_logo_url }}" alt="{{ brand.name }}" style="max-height: 40px; max-width: 80%; object-fit: contain;">
+            </div>
+            <h6 class="fw-bold text-dark mb-1">{{ brand.name }}</h6>
+            <small class="text-muted">{{ brand.products.count }} Models</small>
+          </a>
+        </div>
+      {% empty %}
+        <div class="col-12 text-center py-3 text-muted">Brands will appear here after database seed.</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- =========================================================
+       FEATURED SMARTPHONES GRID
+       ========================================================= -->
+  <section class="mb-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-end mb-4">
+      <div>
+        <span class="badge badge-emerald mb-2">Editor's Choice</span>
+        <h3 class="fw-bold mb-0">Featured Flagship Smartphones</h3>
+      </div>
+      <a href="{% url 'store:product_list' %}" class="btn btn-outline-emerald rounded-pill mt-2 mt-sm-0">
+        Explore All {{ total_products|default:"Phones" }} <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+      {% for product in featured_products %}
+        <div class="col">
+          <div class="gp-card">
+            <!-- Wishlist Button -->
+            {% if user.is_authenticated %}
+              <button class="gp-wishlist-btn ajax-wishlist-btn" data-product-id="{{ product.id }}" title="Save to Wishlist">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+            {% endif %}
+
+            <!-- Image with Badges -->
+            <div class="gp-card-img-wrap">
+              <div class="position-absolute top-0 start-0 m-2 d-flex flex-column gap-1">
+                {% if product.is_5g %}
+                  <span class="badge badge-5g">5G</span>
+                {% endif %}
+                {% if product.get_discount_percentage > 0 %}
+                  <span class="badge badge-discount">-{{ product.get_discount_percentage }}% OFF</span>
+                {% endif %}
+              </div>
+              <a href="{{ product.get_absolute_url }}">
+                <img src="{{ product.get_image_url }}" alt="{{ product.name }}" class="gp-card-img">
+              </a>
+            </div>
+
+            <!-- Card Content -->
+            <div class="p-3 d-flex flex-column flex-grow-1">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="text-muted fw-bold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">{{ product.brand.name }}</span>
+                <span class="text-warning fw-bold" style="font-size: 0.85rem;">
+                  <i class="fa-solid fa-star"></i> {{ product.rating }} <small class="text-muted">({{ product.reviews_count }})</small>
+                </span>
+              </div>
+
+              <h6 class="fw-bold mb-2">
+                <a href="{{ product.get_absolute_url }}" class="text-dark text-decoration-none line-clamp-1">
+                  {{ product.name }}
+                </a>
+              </h6>
+
+              <!-- Specs Pills -->
+              {% if product.specs %}
+                <div class="d-flex flex-wrap gap-1 mb-3">
+                  <span class="gp-specs-pill"><i class="fa-solid fa-microchip text-emerald-600"></i> {{ product.specs.ram }}</span>
+                  <span class="gp-specs-pill"><i class="fa-solid fa-hard-drive text-emerald-600"></i> {{ product.specs.storage }}</span>
+                </div>
+              {% endif %}
+
+              <!-- Price & Action -->
+              <div class="mt-auto pt-2 d-flex justify-content-between align-items-center border-top">
+                <div>
+                  <div class="fs-5 fw-extrabold text-emerald-700" style="color: #047857;">
+                    ₹{{ product.get_current_price }}
+                  </div>
+                  {% if product.discount_price %}
+                    <small class="text-muted text-decoration-line-through">₹{{ product.price }}</small>
+                  {% endif %}
+                </div>
+
+                <form method="POST" action="{% url 'store:add_to_cart' product.id %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="quantity" value="1">
+                  <button type="submit" class="btn btn-sm btn-emerald px-3 rounded-pill" title="Add to Cart">
+                    <i class="fa-solid fa-cart-plus me-1"></i> Add
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12 text-center py-5">
+          <div class="p-4 bg-white rounded-4 shadow-sm border">
+            <h5>No products found yet!</h5>
+            <p class="text-muted">Run the database seed script to populate smartphones.</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SCHEDULED DELIVERY & RAZORPAY PROMO BANNER
+       ========================================================= -->
+  <section class="mb-5 p-4 p-md-5 rounded-4 shadow-sm" style="background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%); border: 1.5px solid #A7F3D0;">
+    <div class="row align-items-center g-4">
+      <div class="col-md-7">
+        <span class="badge bg-emerald-600 text-white mb-2 p-2 px-3" style="background: #059669;">📦 Next-Level Convenience</span>
+        <h3 class="fw-extrabold text-emerald-950 mb-3" style="color: #064E3B;">
+          Choose Your Preferred Delivery Date & Time Slot
+        </h3>
+        <p class="text-emerald-900 mb-4" style="color: #065F46; line-height: 1.6;">
+          Never miss a parcel delivery again. At checkout, pick between <strong>Morning (9AM-1PM)</strong>, <strong>Afternoon (1PM-5PM)</strong>, <strong>Evening (5PM-9PM)</strong>, or <strong>⚡ Express 3-Hour Dispatch</strong>.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{% url 'store:product_list' %}" class="btn btn-emerald rounded-pill px-4 py-2">
+            <i class="fa-solid fa-calendar-days me-2"></i> Shop & Schedule Delivery
+          </a>
+        </div>
+      </div>
+      <div class="col-md-5 text-center">
+        <div class="bg-white p-4 rounded-4 shadow-sm border border-success d-inline-block text-start w-100" style="max-width: 360px;">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="badge bg-success rounded-circle p-2"><i class="fa-solid fa-clock text-white"></i></span>
+            <div>
+              <div class="fw-bold text-dark">Flexible Schedule Slots</div>
+              <small class="text-muted">Direct doorstep courier tracking</small>
+            </div>
+          </div>
+          <div class="p-2 mb-2 rounded bg-light border d-flex justify-content-between align-items-center" style="font-size: 0.85rem;">
+            <span><i class="fa-solid fa-sun text-warning me-2"></i> Morning Slot</span>
+            <span class="badge bg-emerald-100 text-emerald-800" style="background: #D1FAE5; color: #065F46;">09:00 AM - 01:00 PM</span>
+          </div>
+          <div class="p-2 mb-2 rounded bg-light border d-flex justify-content-between align-items-center" style="font-size: 0.85rem;">
+            <span><i class="fa-solid fa-cloud-sun text-info me-2"></i> Afternoon Slot</span>
+            <span class="badge bg-emerald-100 text-emerald-800" style="background: #D1FAE5; color: #065F46;">01:00 PM - 05:00 PM</span>
+          </div>
+          <div class="p-2 rounded bg-light border d-flex justify-content-between align-items-center" style="font-size: 0.85rem;">
+            <span><i class="fa-solid fa-bolt text-danger me-2"></i> Priority Express</span>
+            <span class="badge bg-emerald-600 text-white" style="background: #059669;">Same Day Express</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       TRENDING 5G DEALS
+       ========================================================= -->
+  {% if deals %}
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <span class="badge bg-danger text-white mb-2">Limited Time Deals</span>
+        <h3 class="fw-bold mb-0">Hot Discounts & Price Drops</h3>
+      </div>
+      <a href="{% url 'store:product_list' %}" class="btn btn-sm btn-outline-emerald rounded-pill">View All Deals</a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+      {% for product in deals %}
+        <div class="col">
+          <div class="gp-card">
+            <div class="gp-card-img-wrap">
+              <span class="position-absolute top-0 start-0 m-2 badge badge-discount">Save ₹{{ product.price|floatformat:0 }}</span>
+              <a href="{{ product.get_absolute_url }}">
+                <img src="{{ product.get_image_url }}" alt="{{ product.name }}" class="gp-card-img">
+              </a>
+            </div>
+            <div class="p-3 d-flex flex-column flex-grow-1">
+              <small class="text-muted fw-bold">{{ product.brand.name }}</small>
+              <h6 class="fw-bold mb-2">
+                <a href="{{ product.get_absolute_url }}" class="text-dark text-decoration-none line-clamp-1">{{ product.name }}</a>
+              </h6>
+              <div class="mt-auto d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="fs-5 fw-bold text-success">₹{{ product.get_current_price }}</span>
+                  <small class="text-muted text-decoration-line-through d-block">₹{{ product.price }}</small>
+                </div>
+                <a href="{{ product.get_absolute_url }}" class="btn btn-sm btn-outline-emerald rounded-pill">
+                  View Specs
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}

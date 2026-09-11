@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}{{ product.name }} - GreenPulse Mobile Store{% endblock %}
+
+{% block extra_css %}
+<style>
+  .product-thumb-item {
+    cursor: pointer;
+    border: 2px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 4px;
+    transition: all 0.2s ease;
+    background: #FFFFFF;
+  }
+  .product-thumb-item:hover, .product-thumb-item.active-thumb {
+    border-color: #10B981;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  }
+  .color-option-btn {
+    border: 2px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    background: #FFFFFF;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .color-option-btn:hover, .color-option-btn.active {
+    border-color: #10B981;
+    background: #ECFDF5;
+    color: #065F46;
+  }
+  .storage-option-btn {
+    border: 2px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    background: #FFFFFF;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .storage-option-btn:hover, .storage-option-btn.active {
+    border-color: #10B981;
+    background: #ECFDF5;
+    color: #065F46;
+  }
+  .spec-row {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #F1F5F9;
+  }
+  .spec-row:nth-child(even) {
+    background-color: #F8FAFC;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb" style="font-size: 0.88rem;">
+      <li class="breadcrumb-item"><a href="{% url 'store:home' %}" class="text-emerald-700 text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'store:product_list' %}" class="text-emerald-700 text-decoration-none">Smartphones</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'store:product_list' %}?brand={{ product.brand.slug }}" class="text-emerald-700 text-decoration-none">{{ product.brand.name }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-5 mb-5">
+    <!-- Image Gallery (Left Column) -->
+    <div class="col-lg-6">
+      <div class="bg-white p-4 rounded-4 shadow-sm border text-center position-relative mb-3" style="border-color: rgba(16, 185, 129, 0.2) !important;">
+        <!-- Top Badges -->
+        <div class="position-absolute top-0 start-0 m-3 d-flex flex-column gap-1">
+          {% if product.is_5g %}
+            <span class="badge badge-5g">5G Flagship</span>
+          {% endif %}
+          {% if product.get_discount_percentage > 0 %}
+            <span class="badge badge-discount">-{{ product.get_discount_percentage }}% OFF</span>
+          {% endif %}
+        </div>
+
+        <img id="main-product-img" src="{{ product.get_image_url }}" alt="{{ product.name }}" class="img-fluid" style="max-height: 420px; object-fit: contain; transition: opacity 0.2s;">
+      </div>
+
+      <!-- Thumbnail Thumbnails Gallery -->
+      <div class="d-flex gap-2 justify-content-center flex-wrap">
+        <div class="product-thumb-item active-thumb" data-img-url="{{ product.get_image_url }}">
+          <img src="{{ product.get_image_url }}" alt="{{ product.name }}" style="width: 54px; height: 54px; object-fit: contain;">
+        </div>
+        {% for img in gallery %}
+          <div class="product-thumb-item" data-img-url="{{ img.get_image_url }}">
+            <img src="{{ img.get_image_url }}" alt="Gallery Image" style="width: 54px; height: 54px; object-fit: contain;">
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Product Summary & Purchase Form (Right Column) -->
+    <div class="col-lg-6">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="badge badge-emerald text-uppercase">{{ product.brand.name }}</span>
+        {% if product.category %}
+          <span class="badge bg-light text-secondary border">{{ product.category.name }}</span>
+        {% endif %}
+      </div>
+
+      <h1 class="fw-extrabold mb-2" style="font-size: 2rem;">{{ product.name }}</h1>
+
+      <!-- Rating & Stock Badge -->
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="text-warning fw-bold">
+          <i class="fa-solid fa-star"></i> {{ product.rating }}
+          <span class="text-muted fw-normal" style="font-size: 0.88rem;">({{ product.reviews_count }} verified reviews)</span>
+        </div>
+        <span>|</span>
+        {% if product.in_stock %}
+          <span class="badge bg-emerald-100 text-emerald-800" style="background: #D1FAE5; color: #065F46;">
+            <i class="fa-solid fa-circle-check me-1"></i> In Stock ({{ product.stock }} units)
+          </span>
+        {% else %}
+          <span class="badge bg-danger text-white">Out of Stock</span>
+        {% endif %}
+      </div>
+
+      <!-- Price Section -->
+      <div class="p-3 rounded-4 mb-4" style="background: #ECFDF5; border: 1.5px solid #A7F3D0;">
+        <div class="d-flex align-items-baseline gap-3">
+          <span class="display-6 fw-extrabold text-emerald-800" style="color: #047857;">
+            ₹{{ product.get_current_price }}
+          </span>
+          {% if product.discount_price %}
+            <span class="fs-5 text-muted text-decoration-line-through">₹{{ product.price }}</span>
+            <span class="badge bg-danger rounded-pill">Save ₹{{ product.price|floatformat:0 }}</span>
+          {% endif %}
+        </div>
+        <small class="text-emerald-800 d-block mt-1">
+          <i class="fa-solid fa-shield-check me-1"></i> Inclusive of all taxes & Razorpay buyer protection.
+        </small>
+      </div>
+
+      <!-- Add to Cart & Buy Form -->
+      <form method="POST" action="{% url 'store:add_to_cart' product.id %}" class="mb-4">
+        {% csrf_token %}
+
+        <!-- Color Variant Selector -->
+        {% if product.specs %}
+          <div class="mb-3">
+            <label class="fw-bold mb-2 text-dark">Select Color: <span id="selected-color-label" class="text-emerald-600 font-monospace">{{ product.specs.get_color_list.0 }}</span></label>
+            <input type="hidden" name="color" id="selected-color-input" value="{{ product.specs.get_color_list.0|default:'Standard' }}">
+            <div class="d-flex flex-wrap gap-2">
+              {% for col in product.specs.get_color_list %}
+                <button type="button" class="color-option-btn {% if forloop.first %}active{% endif %}" data-color="{{ col }}">
+                  <i class="fa-solid fa-circle me-1 text-emerald-500" style="color: #10B981;"></i> {{ col }}
+                </button>
+              {% empty %}
+                <button type="button" class="color-option-btn active" data-color="Standard">Standard</button>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Storage Selector -->
+          <div class="mb-3">
+            <label class="fw-bold mb-2 text-dark">Storage Variant:</label>
+            <input type="hidden" name="storage" id="selected-storage-input" value="{{ product.specs.storage }}">
+            <div class="d-flex flex-wrap gap-2">
+              <button type="button" class="storage-option-btn active" data-storage="{{ product.specs.storage }}">
+                <i class="fa-solid fa-hard-drive me-1"></i> {{ product.specs.storage }}
+              </button>
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Quantity & Action Buttons -->
+        <div class="d-flex flex-wrap align-items-center gap-3 mt-4">
+          <div class="gp-qty-group">
+            <button type="button" class="gp-qty-btn" onclick="let q=document.getElementById('qty-input'); if(q.value>1) q.value--;">-</button>
+            <input type="number" id="qty-input" name="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control text-center border-0 fw-bold" style="width: 50px;" readonly>
+            <button type="button" class="gp-qty-btn" onclick="let q=document.getElementById('qty-input'); if(q.value<{{ product.stock }}) q.value++;">+</button>
+          </div>
+
+          <button type="submit" class="btn btn-emerald btn-lg px-4 flex-grow-1" {% if not product.in_stock %}disabled{% endif %}>
+            <i class="fa-solid fa-cart-shopping me-2"></i> Add to Cart
+          </button>
+
+          <button type="submit" name="buy_now" value="1" class="btn btn-forest btn-lg px-4" {% if not product.in_stock %}disabled{% endif %}>
+            <i class="fa-solid fa-bolt me-1"></i> Buy Now
+          </button>
+
+          {% if user.is_authenticated %}
+            <button type="button" class="btn btn-outline-secondary btn-lg ajax-wishlist-btn px-3 {% if in_wishlist %}text-danger border-danger{% endif %}" data-product-id="{{ product.id }}" title="Wishlist">
+              <i class="fa-{% if in_wishlist %}solid{% else %}regular{% endif %} fa-heart"></i>
+            </button>
+          {% endif %}
+        </div>
+      </form>
+
+      <!-- Delivery Schedule Value Note -->
+      <div class="p-3 bg-white rounded-4 border shadow-sm" style="border-color: rgba(16, 185, 129, 0.2) !important;">
+        <div class="d-flex align-items-center gap-3">
+          <i class="fa-solid fa-calendar-check text-emerald-600 fs-3" style="color: #10B981;"></i>
+          <div>
+            <h6 class="fw-bold mb-0">Delivery Scheduling Available at Checkout</h6>
+            <small class="text-muted">Choose your delivery date & slot (Morning, Afternoon, Evening, or Express Same-Day).</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       SPECIFICATIONS & DESCRIPTION TABS
+       ========================================================= -->
+  <section class="mb-5 bg-white p-4 p-md-5 rounded-4 shadow-sm border" style="border-color: rgba(16, 185, 129, 0.18) !important;">
+    <ul class="nav nav-pills mb-4 gap-2" id="prodTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active rounded-pill px-4" id="specs-tab" data-bs-toggle="pill" data-bs-target="#specs-content" type="button" style="font-weight: 700;">
+          <i class="fa-solid fa-list-check me-2"></i> Technical Specifications
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-pill px-4" id="desc-tab" data-bs-toggle="pill" data-bs-target="#desc-content" type="button" style="font-weight: 700;">
+          <i class="fa-solid fa-circle-info me-2"></i> Full Overview
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link rounded-pill px-4" id="reviews-tab" data-bs-toggle="pill" data-bs-target="#reviews-content" type="button" style="font-weight: 700;">
+          <i class="fa-solid fa-star me-2"></i> Customer Reviews ({{ reviews.count }})
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="prodTabsContent">
+      <!-- Specifications Tab -->
+      <div class="tab-pane fade show active" id="specs-content" role="tabpanel">
+        {% if product.specs %}
+          <div class="table-responsive rounded-3 border">
+            <div class="spec-row row m-0"><div class="col-sm-4 fw-bold text-dark"><i class="fa-solid fa-microchip text-emerald-600 me-2"></i> Processor</div><div class="col-sm-8 text-secondary">{{ product.specs.processor }}</div></div>
+            <div class="spec-row row m-0"><div class="col-sm-4 fw-bold text-dark"><i class="fa-solid fa-memory text-emerald-600 me-2"></i> RAM / Memory</div><div class="col-sm-8 text-secondary">{{ product.specs.ram }}</div></div>
+            <div class="spec-row row m-0"><div class="col-sm-4 fw-bold text-dark"><i class="fa-solid fa-hard-drive text-emerald-600 me-2"></i> Internal Storage</div><div class="col-sm-8 text-secondary">{{ product.specs.storage }}</div></div>
+            <div class="spec-row row m-0"><div class="col-sm-4 fw-bold text-dark"><i class="fa-solid fa-mobile text-emerald-600 me-2"></i> Display Screen</div><div class="col-sm-8 text-secondary">{{ product.specs.display }}</div></div>
+            <div class="spec-row row m-0"><div class="col-sm-4 fw-bold text-dark"><i class="fa-solid fa-camera text-emerald-600 me-2"></i> Rear Camera</div><div class="col-sm-8 text-secondary">{{ product.specs.camera_rear }}</div></div>
+            <div class="spec-row row m-0"><div class="col-sm-4 fw-bold text-dark"><i class="fa-solid fa-camera-rotate text-emerald-600 me-2"></i> Selfie Camera</div><div class="col-sm-8 text-secondary">{{ product.specs.camera_front }}</div></div>
+            <div class="spec-row row m-0"><div class="col-sm-4 fw-bold text-dark"><i class="fa-solid fa-battery-full text-emerald-600 me-2"></i> Battery & Charging</div><div class="col-sm-8 text-secondary">{{ product.specs.battery }}</div></div>
+            <div class="spec-row row m-0"><div class="col-sm-4 fw-bold text-dark"><i class="fa-solid fa-code text-emerald-600 me-2"></i> Operating System</div><div class="col-sm-8 text-secondary">{{ product.specs.operating_system }}</div></div>
+            <div class="spec-row row m-0"><div class="col-sm-4 fw-bold text-dark"><i class="fa-solid fa-wifi text-emerald-600 me-2"></i> Connectivity & 5G</div><div class="col-sm-8 text-secondary">{{ product.specs.network }}</div></div>
+            <div class="spec-row row m-0"><div class="col-sm-4 fw-bold text-dark"><i class="fa-solid fa-palette text-emerald-600 me-2"></i> Available Colors</div><div class="col-sm-8 text-secondary">{{ product.specs.colors }}</div></div>
+            <div class="spec-row row m-0"><div class="col-sm-4 fw-bold text-dark"><i class="fa-solid fa-shield text-emerald-600 me-2"></i> Warranty & Protection</div><div class="col-sm-8 text-secondary">{{ product.specs.warranty }}</div></div>
+          </div>
+        {% else %}
+          <p class="text-muted">Specifications will be listed shortly.</p>
+        {% endif %}
+      </div>
+
+      <!-- Description Tab -->
+      <div class="tab-pane fade" id="desc-content" role="tabpanel">
+        <div class="text-secondary" style="line-height: 1.8; font-size: 1.02rem;">
+          {{ product.description|linebreaks }}
+        </div>
+      </div>
+
+      <!-- Reviews Tab -->
+      <div class="tab-pane fade" id="reviews-content" role="tabpanel">
+        <div class="row g-4">
+          <!-- Reviews List -->
+          <div class="col-lg-7">
+            <h5 class="fw-bold mb-3">Customer Feedback</h5>
+            {% for rev in reviews %}
+              <div class="p-3 mb-3 bg-light rounded-4 border">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="fw-bold text-dark">{{ rev.author_name }}</span>
+                  <div class="text-warning">
+                    {% for i in "12345"|make_list %}
+                      {% if forloop.counter <= rev.rating %}★{% else %}☆{% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+                {% if rev.title %}
+                  <div class="fw-semibold text-emerald-900 mb-1">{{ rev.title }}</div>
+                {% endif %}
+                <p class="text-secondary small mb-1">{{ rev.comment }}</p>
+                <small class="text-muted" style="font-size: 0.75rem;">Verified Purchase • {{ rev.created_at|date:"M d, Y" }}</small>
+              </div>
+            {% empty %}
+              <p class="text-muted">No reviews yet. Be the first to share your thoughts!</p>
+            {% endfor %}
+          </div>
+
+          <!-- Add Review Form -->
+          <div class="col-lg-5">
+            <div class="p-4 bg-white rounded-4 border" style="border-color: rgba(16, 185, 129, 0.3) !important;">
+              <h5 class="fw-bold mb-3 text-emerald-950">Write a Review</h5>
+              <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="submit_review" value="1">
+                <div class="mb-2">
+                  <label class="form-label small fw-semibold">Your Name</label>
+                  {{ review_form.author_name }}
+                </div>
+                <div class="mb-2">
+                  <label class="form-label small fw-semibold">Rating</label>
+                  {{ review_form.rating }}
+                </div>
+                <div class="mb-2">
+                  <label class="form-label small fw-semibold">Headline</label>
+                  {{ review_form.title }}
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-semibold">Your Review</label>
+                  {{ review_form.comment }}
+                </div>
+                <button type="submit" class="btn btn-emerald w-100 rounded-pill">Submit Review</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Related Phones -->
+  {% if related_products %}
+  <section>
+    <h4 class="fw-bold mb-4">You Might Also Like</h4>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+      {% for rel in related_products %}
+        <div class="col">
+          <div class="gp-card">
+            <div class="gp-card-img-wrap">
+              <a href="{{ rel.get_absolute_url }}">
+                <img src="{{ rel.get_image_url }}" alt="{{ rel.name }}" class="gp-card-img">
+              </a>
+            </div>
+            <div class="p-3">
+              <small class="text-muted fw-bold">{{ rel.brand.name }}</small>
+              <h6 class="fw-bold mb-1"><a href="{{ rel.get_absolute_url }}" class="text-dark text-decoration-none">{{ rel.name }}</a></h6>
+              <div class="fw-bold text-success">₹{{ rel.get_current_price }}</div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}

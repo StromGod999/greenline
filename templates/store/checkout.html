@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}Secure Checkout & Delivery Scheduling - GreenPulse{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb" style="font-size: 0.88rem;">
+      <li class="breadcrumb-item"><a href="{% url 'store:home' %}" class="text-emerald-700 text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'store:cart' %}" class="text-emerald-700 text-decoration-none">Cart</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Checkout & Scheduling</li>
+    </ol>
+  </nav>
+
+  <h2 class="fw-bold mb-4"><i class="fa-solid fa-lock text-emerald-600 me-2" style="color: #10B981;"></i> Secure Checkout & Delivery Scheduling</h2>
+
+  <form method="POST" action="{% url 'store:checkout' %}">
+    {% csrf_token %}
+
+    <div class="row g-4">
+      <!-- Checkout Form Sections (Left) -->
+      <div class="col-lg-8">
+
+        <!-- SECTION 1: Customer Contact & Shipping Address -->
+        <div class="gp-checkout-card mb-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="gp-step-badge">1</span>
+            <h5 class="fw-bold mb-0">Shipping & Delivery Information</h5>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Full Name *</label>
+              {{ form.full_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Email Address *</label>
+              {{ form.email }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Phone Number *</label>
+              {{ form.phone }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Street Address *</label>
+              {{ form.address }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold">City *</label>
+              {{ form.city }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold">State / Province *</label>
+              {{ form.state }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-bold">Postal / ZIP Code *</label>
+              {{ form.pincode }}
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: Order Delivery Scheduling Module -->
+        <div class="gp-checkout-card mb-4" style="background: linear-gradient(180deg, #FFFFFF 0%, #F0FDF4 100%);">
+          <div class="d-flex align-items-center mb-3">
+            <span class="gp-step-badge">2</span>
+            <div>
+              <h5 class="fw-bold mb-0">Delivery Scheduling & Time Slot</h5>
+              <small class="text-muted">Select when you want your smartphone delivered to your doorstep</small>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <!-- Date Picker -->
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-emerald-950">
+                <i class="fa-solid fa-calendar-day text-emerald-600 me-1"></i> Preferred Delivery Date *
+              </label>
+              <input type="date" name="scheduled_date" class="form-control green-input" value="{{ default_delivery_date }}" min="{{ min_delivery_date }}" max="{{ max_delivery_date }}" required>
+              <small class="text-muted">Slots available for next 14 days</small>
+            </div>
+
+            <!-- Time Slot Selection -->
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-emerald-950">
+                <i class="fa-solid fa-clock text-emerald-600 me-1"></i> Preferred Delivery Slot *
+              </label>
+              {{ form.delivery_time_slot }}
+              <small class="text-muted">Courier will contact you 30 mins prior to arrival</small>
+            </div>
+
+            <!-- Special Gate Instructions -->
+            <div class="col-12">
+              <label class="form-label small fw-bold">Delivery Gate / Address Instructions (Optional)</label>
+              {{ form.schedule_notes }}
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3: Payment Gateway Selection -->
+        <div class="gp-checkout-card mb-4">
+          <div class="d-flex align-items-center mb-3">
+            <span class="gp-step-badge">3</span>
+            <div>
+              <h5 class="fw-bold mb-0">Select Payment Method</h5>
+              <small class="text-muted">All transactions are encrypted with 256-bit SSL security</small>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <!-- Razorpay Option -->
+            <div class="col-md-6">
+              <label class="card p-3 h-100 cursor-pointer border-2 position-relative" style="border-color: #10B981 !important; background: #ECFDF5;">
+                <div class="d-flex align-items-center gap-3">
+                  <input class="form-check-input" type="radio" name="payment_method" value="razorpay" checked id="pay_rzp">
+                  <div>
+                    <div class="fw-bold text-emerald-950">
+                      <i class="fa-solid fa-shield-halved text-emerald-600 me-1"></i> Razorpay Payment Gateway
+                    </div>
+                    <small class="text-muted d-block">Cards, UPI (GPay/PhonePe), Netbanking, Wallets</small>
+                    <span class="badge bg-emerald-600 text-white mt-1" style="background: #059669; font-size: 0.7rem;">Recommended & Instant</span>
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            <!-- Cash on Delivery Option -->
+            <div class="col-md-6">
+              <label class="card p-3 h-100 cursor-pointer border-2" style="border-color: #E2E8F0;">
+                <div class="d-flex align-items-center gap-3">
+                  <input class="form-check-input" type="radio" name="payment_method" value="cod" id="pay_cod">
+                  <div>
+                    <div class="fw-bold text-dark">
+                      <i class="fa-solid fa-hand-holding-dollar text-secondary me-1"></i> Cash on Delivery (COD)
+                    </div>
+                    <small class="text-muted d-block">Pay with cash or QR code when parcel arrives</small>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Checkout Sidebar / Order Summary (Right) -->
+      <div class="col-lg-4">
+        <div class="bg-white p-4 rounded-4 shadow-sm border" style="border-color: rgba(16, 185, 129, 0.25) !important; position: sticky; top: 90px;">
+          <h5 class="fw-bold text-dark mb-3">Order Items ({{ cart_items.count }})</h5>
+
+          <!-- Mini Items list -->
+          <div class="mb-3" style="max-height: 220px; overflow-y: auto;">
+            {% for item in cart_items %}
+              <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom">
+                <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}" style="width: 40px; height: 40px; object-fit: contain;">
+                <div class="flex-grow-1 text-truncate">
+                  <div class="fw-bold text-dark small text-truncate">{{ item.product.name }}</div>
+                  <small class="text-muted">Qty: {{ item.quantity }} • {{ item.storage }}</small>
+                </div>
+                <div class="fw-bold text-dark small">₹{{ item.get_total_price }}</div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Totals Calculation -->
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-secondary small">Subtotal</span>
+            <span class="fw-bold text-dark">₹{{ subtotal }}</span>
+          </div>
+
+          {% if discount_amount > 0 %}
+            <div class="d-flex justify-content-between mb-2 text-success small">
+              <span>Coupon Discount</span>
+              <span class="fw-bold">-₹{{ discount_amount }}</span>
+            </div>
+          {% endif %}
+
+          <div class="d-flex justify-content-between mb-3">
+            <span class="text-secondary small">Scheduled Shipping</span>
+            {% if shipping_charge == 0 %}
+              <span class="badge bg-emerald-100 text-emerald-800 fw-bold" style="background: #D1FAE5; color: #065F46;">FREE</span>
+            {% else %}
+              <span class="fw-bold text-dark">₹{{ shipping_charge }}</span>
+            {% endif %}
+          </div>
+
+          <hr class="my-3">
+
+          <div class="d-flex justify-content-between align-items-baseline mb-4">
+            <span class="fs-5 fw-bold text-dark">Grand Total</span>
+            <span class="fs-3 fw-extrabold text-emerald-800" style="color: #047857;">₹{{ total_amount }}</span>
+          </div>
+
+          <!-- Submit Order Button -->
+          <button type="submit" class="btn btn-emerald btn-lg w-100 py-3 rounded-pill shadow-lg mb-3">
+            <i class="fa-solid fa-circle-check me-2"></i> Place Order & Continue
+          </button>
+
+          <div class="text-center text-muted" style="font-size: 0.8rem;">
+            <i class="fa-solid fa-lock text-emerald-600 me-1"></i> 256-Bit SSL Encrypted & Protected
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </form>
+
+</div>
+{% endblock %}

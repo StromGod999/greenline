@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}Store Admin & Delivery Schedule Dashboard - GreenPulse{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 py-4">
+
+  <!-- Admin Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 p-4 rounded-4 text-white shadow-sm green-texture-bg">
+    <div>
+      <span class="badge bg-emerald-500 text-white mb-2" style="background: #10B981;">⚡ Store Manager Portal</span>
+      <h2 class="fw-extrabold text-white mb-0">Order Dispatch & Delivery Schedule Hub</h2>
+      <p class="text-emerald-100 mb-0 small" style="color: #A7F3D0;">Monitor customer orders, upcoming delivery schedules, inventory stock, and sales metrics.</p>
+    </div>
+    <div class="d-flex gap-2 mt-3 mt-md-0">
+      <a href="/admin/" target="_blank" class="btn btn-outline-light rounded-pill btn-sm">
+        <i class="fa-solid fa-sliders me-1"></i> Django Admin
+      </a>
+      <a href="{% url 'store:home' %}" class="btn btn-emerald rounded-pill btn-sm">
+        <i class="fa-solid fa-store me-1"></i> Live Storefront
+      </a>
+    </div>
+  </div>
+
+  <!-- Real-time KPI Stat Cards -->
+  <div class="row g-3 mb-4">
+    <!-- Total Revenue -->
+    <div class="col-sm-6 col-xl-3">
+      <div class="gp-admin-stat-card">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-muted small fw-bold text-uppercase">Total Revenue</span>
+            <h3 class="fw-extrabold text-emerald-800 mb-0" style="color: #047857;">₹{{ total_revenue }}</h3>
+          </div>
+          <div class="gp-admin-stat-icon"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Orders -->
+    <div class="col-sm-6 col-xl-3">
+      <div class="gp-admin-stat-card">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-muted small fw-bold text-uppercase">Total Orders</span>
+            <h3 class="fw-extrabold text-dark mb-0">{{ total_orders }}</h3>
+          </div>
+          <div class="gp-admin-stat-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Mobiles in Stock -->
+    <div class="col-sm-6 col-xl-3">
+      <div class="gp-admin-stat-card">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-muted small fw-bold text-uppercase">Active Smartphones</span>
+            <h3 class="fw-extrabold text-dark mb-0">{{ total_products }}</h3>
+          </div>
+          <div class="gp-admin-stat-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Low Stock Warning -->
+    <div class="col-sm-6 col-xl-3">
+      <div class="gp-admin-stat-card">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-muted small fw-bold text-uppercase">Low Stock Alert</span>
+            <h3 class="fw-extrabold text-danger mb-0">{{ low_stock_count }}</h3>
+          </div>
+          <div class="gp-admin-stat-icon bg-danger-subtle text-danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs for Admin Modules -->
+  <ul class="nav nav-pills mb-4 gap-2" id="adminTabs" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active rounded-pill px-4" data-bs-toggle="pill" data-bs-target="#tab-schedule" style="font-weight: 700;">
+        <i class="fa-solid fa-calendar-check me-2"></i> Delivery Schedule Manager ({{ scheduled_deliveries.count }})
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link rounded-pill px-4" data-bs-toggle="pill" data-bs-target="#tab-all-orders" style="font-weight: 700;">
+        <i class="fa-solid fa-list-check me-2"></i> Recent Orders & Status
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link rounded-pill px-4" data-bs-toggle="pill" data-bs-target="#tab-inventory" style="font-weight: 700;">
+        <i class="fa-solid fa-boxes-stacked me-2"></i> Inventory & Stock Control
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="adminTabsContent">
+
+    <!-- =========================================================
+         TAB 1: DELIVERY SCHEDULE MANAGER
+         ========================================================= -->
+    <div class="tab-pane fade show active" id="tab-schedule" role="tabpanel">
+      <div class="bg-white p-4 rounded-4 shadow-sm border mb-4" style="border-color: rgba(16, 185, 129, 0.2) !important;">
+        
+        <!-- Date Filter Toolbar -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 pb-3 border-bottom">
+          <div>
+            <h4 class="fw-bold mb-1">Scheduled Dispatches for: <span class="text-emerald-700">{{ selected_date }}</span></h4>
+            <small class="text-muted">Filtered by customer's preferred delivery date.</small>
+          </div>
+
+          <form method="GET" class="d-flex align-items-center gap-2">
+            <label class="small fw-bold text-muted">Change Date:</label>
+            <input type="date" name="date" class="form-control form-control-sm green-input" value="{{ selected_date }}">
+            <button type="submit" class="btn btn-sm btn-emerald rounded-pill px-3">Filter</button>
+          </form>
+        </div>
+
+        {% if scheduled_deliveries %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead style="background: #ECFDF5;">
+                <tr>
+                  <th>Order #</th>
+                  <th>Customer & Contact</th>
+                  <th>Delivery Slot</th>
+                  <th>Address & Gate Notes</th>
+                  <th>Status</th>
+                  <th>Payment</th>
+                  <th>Total</th>
+                  <th>Update Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in scheduled_deliveries %}
+                  <tr>
+                    <td>
+                      <strong class="font-monospace text-emerald-800">{{ order.order_number }}</strong>
+                      <br><small class="text-muted">{{ order.items.count }} item(s)</small>
+                    </td>
+                    <td>
+                      <div class="fw-bold text-dark">{{ order.full_name }}</div>
+                      <small class="text-muted"><i class="fa-solid fa-phone me-1"></i> {{ order.phone }}</small>
+                    </td>
+                    <td>
+                      <span class="gp-schedule-badge">
+                        <i class="fa-solid fa-clock me-1"></i> {{ order.delivery_time_slot }}
+                      </span>
+                    </td>
+                    <td style="max-width: 250px;">
+                      <div class="small text-truncate" title="{{ order.address }}, {{ order.city }}">{{ order.address }}, {{ order.city }}</div>
+                      {% if order.schedule_notes %}
+                        <small class="text-success d-block"><i class="fa-solid fa-circle-info me-1"></i> Note: {{ order.schedule_notes }}</small>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <span class="badge {{ order.get_status_badge_class }}">{{ order.order_status }}</span>
+                    </td>
+                    <td>
+                      <span class="small fw-bold text-{% if order.payment_status == 'Paid' %}success{% else %}warning{% endif %}">
+                        ● {{ order.payment_status }}
+                      </span>
+                      <small class="text-muted d-block font-monospace">{{ order.get_payment_method_display }}</small>
+                    </td>
+                    <td class="fw-extrabold text-emerald-800">₹{{ order.total_amount }}</td>
+                    <td>
+                      <button type="button" class="btn btn-sm btn-outline-emerald rounded-pill" data-bs-toggle="modal" data-bs-target="#updateOrderModal{{ order.id }}">
+                        <i class="fa-solid fa-pen-to-square me-1"></i> Update
+                      </button>
+                    </td>
+                  </tr>
+
+                  <!-- Update Modal for Order -->
+                  <div class="modal fade" id="updateOrderModal{{ order.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content rounded-4 border-0 shadow-lg">
+                        <div class="modal-header text-white" style="background: #064E3B;">
+                          <h6 class="modal-title fw-bold">Update Order #{{ order.order_number }}</h6>
+                          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form method="POST" action="{% url 'store:admin_update_order_status' order.id %}">
+                          {% csrf_token %}
+                          <div class="modal-body p-4">
+                            <div class="mb-3">
+                              <label class="form-label small fw-bold">Fulfillment Status</label>
+                              <select name="order_status" class="form-select green-input">
+                                {% for val, label in order_status_choices %}
+                                  <option value="{{ val }}" {% if order.order_status == val %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                            <div class="mb-3">
+                              <label class="form-label small fw-bold">Payment Status</label>
+                              <select name="payment_status" class="form-select green-input">
+                                <option value="Pending" {% if order.payment_status == 'Pending' %}selected{% endif %}>Pending</option>
+                                <option value="Paid" {% if order.payment_status == 'Paid' %}selected{% endif %}>Paid (Captured)</option>
+                                <option value="Failed" {% if order.payment_status == 'Failed' %}selected{% endif %}>Failed</option>
+                              </select>
+                            </div>
+                            <div class="mb-3">
+                              <label class="form-label small fw-bold">Tracking AWB / Courier Number</label>
+                              <input type="text" name="tracking_number" class="form-control green-input" value="{{ order.tracking_number|default:'' }}" placeholder="e.g. DLV-994829">
+                            </div>
+                            <div class="mb-3">
+                              <label class="form-label small fw-bold">Warehouse / Dispatch Notes</label>
+                              <textarea name="dispatch_notes" class="form-control green-input" rows="2" placeholder="Notes for driver or warehouse team...">{{ order.dispatch_notes|default:'' }}</textarea>
+                            </div>
+                          </div>
+                          <div class="modal-footer bg-light">
+                            <button type="button" class="btn btn-sm btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-sm btn-emerald rounded-pill px-4">Save Changes</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="text-center py-5">
+            <i class="fa-solid fa-calendar-xmark text-muted display-4 mb-2"></i>
+            <h5>No deliveries scheduled for {{ selected_date }}</h5>
+            <p class="text-muted">Change the date above or review upcoming scheduled deliveries.</p>
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+    <!-- =========================================================
+         TAB 2: RECENT ORDERS
+         ========================================================= -->
+    <div class="tab-pane fade" id="tab-all-orders" role="tabpanel">
+      <div class="bg-white p-4 rounded-4 shadow-sm border" style="border-color: rgba(16, 185, 129, 0.2) !important;">
+        <h5 class="fw-bold text-dark mb-3">All Customer Orders</h5>
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Scheduled Date</th>
+                <th>Payment</th>
+                <th>Fulfillment Status</th>
+                <th>Total</th>
+                <th>Invoice</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ord in recent_orders %}
+                <tr>
+                  <td><strong class="font-monospace text-emerald-800">{{ ord.order_number }}</strong></td>
+                  <td>{{ ord.full_name }}<br><small class="text-muted">{{ ord.phone }}</small></td>
+                  <td>{{ ord.scheduled_date }}<br><small class="text-muted">{{ ord.delivery_time_slot }}</small></td>
+                  <td><span class="badge bg-{% if ord.payment_status == 'Paid' %}success{% else %}warning{% endif %}">{{ ord.payment_status }}</span></td>
+                  <td><span class="badge {{ ord.get_status_badge_class }}">{{ ord.order_status }}</span></td>
+                  <td class="fw-bold">₹{{ ord.total_amount }}</td>
+                  <td>
+                    <a href="{% url 'store:invoice' ord.order_number %}" target="_blank" class="btn btn-sm btn-light border rounded-pill">
+                      <i class="fa-solid fa-receipt text-emerald-600"></i> Invoice
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         TAB 3: INVENTORY & STOCK CONTROL
+         ========================================================= -->
+    <div class="tab-pane fade" id="tab-inventory" role="tabpanel">
+      <div class="bg-white p-4 rounded-4 shadow-sm border" style="border-color: rgba(16, 185, 129, 0.2) !important;">
+        <h5 class="fw-bold text-dark mb-3">Quick Stock & Price Manager</h5>
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Preview</th>
+                <th>Phone Model</th>
+                <th>Brand</th>
+                <th>Current Stock</th>
+                <th>Price (₹)</th>
+                <th>Status</th>
+                <th>Quick Save</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in products %}
+                <tr>
+                  <td>
+                    <img src="{{ p.get_image_url }}" alt="{{ p.name }}" style="width: 40px; height: 40px; object-fit: contain;">
+                  </td>
+                  <td>
+                    <strong>{{ p.name }}</strong>
+                    <br><small class="text-muted">{{ p.specs.storage|default:'' }}</small>
+                  </td>
+                  <td>{{ p.brand.name }}</td>
+                  <form method="POST" action="{% url 'store:admin_update_product_stock' p.id %}">
+                    {% csrf_token %}
+                    <td style="width: 120px;">
+                      <input type="number" name="stock" value="{{ p.stock }}" min="0" class="form-control form-control-sm green-input">
+                    </td>
+                    <td style="width: 140px;">
+                      <input type="number" step="0.01" name="price" value="{{ p.price }}" min="0" class="form-control form-control-sm green-input">
+                    </td>
+                    <td>
+                      {% if p.stock <= 0 %}
+                        <span class="badge bg-danger">Out of Stock</span>
+                      {% elif p.stock <= 5 %}
+                        <span class="badge bg-warning text-dark">Low Stock ({{ p.stock }})</span>
+                      {% else %}
+                        <span class="badge bg-success">In Stock</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <button type="submit" class="btn btn-sm btn-emerald rounded-pill">
+                        <i class="fa-solid fa-floppy-disk me-1"></i> Save
+                      </button>
+                    </td>
+                  </form>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

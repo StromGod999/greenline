@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}Smartphones Catalog - GreenPulse Mobile Store{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Breadcrumb & Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1" style="font-size: 0.88rem;">
+          <li class="breadcrumb-item"><a href="{% url 'store:home' %}" class="text-emerald-700 text-decoration-none">Home</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Smartphones Catalog</li>
+        </ol>
+      </nav>
+      <h2 class="fw-bold mb-0">Browse Smartphones</h2>
+      <p class="text-muted mb-0">Showing {{ page_obj.paginator.count }} available models</p>
+    </div>
+
+    <!-- Mobile Filter Toggle -->
+    <button class="btn btn-emerald d-lg-none mt-2 mt-sm-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
+      <i class="fa-solid fa-filter me-1"></i> Filters
+    </button>
+  </div>
+
+  <div class="row g-4">
+    <!-- Filter Sidebar (Desktop) -->
+    <div class="col-lg-3 d-none d-lg-block">
+      <div class="bg-white p-4 rounded-4 shadow-sm border" style="border-color: rgba(16, 185, 129, 0.2) !important; position: sticky; top: 90px;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0 text-emerald-950"><i class="fa-solid fa-sliders text-emerald-600 me-2"></i> Filters</h5>
+          <a href="{% url 'store:product_list' %}" class="badge bg-light text-danger border text-decoration-none p-2">Reset All</a>
+        </div>
+
+        <form method="GET" action="{% url 'store:product_list' %}" id="filterForm">
+          {% if search_query %}
+            <input type="hidden" name="q" value="{{ search_query }}">
+          {% endif %}
+
+          <!-- 5G Toggle -->
+          <div class="mb-4 p-2 rounded-3" style="background: #ECFDF5; border: 1px solid #A7F3D0;">
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input" type="checkbox" name="5g" value="1" id="filter5g" {% if is_5g %}checked{% endif %} onchange="this.form.submit()">
+              <label class="form-check-label fw-bold text-emerald-900" for="filter5g">
+                <i class="fa-solid fa-bolt text-emerald-600 me-1"></i> 5G Smartphones Only
+              </label>
+            </div>
+          </div>
+
+          <!-- Brand Filter -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-dark mb-2">Brands</h6>
+            <div style="max-height: 180px; overflow-y: auto;">
+              {% for b in brands %}
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" name="brand" value="{{ b.slug }}" id="brand_{{ b.id }}" {% if b.slug in selected_brands %}checked{% endif %} onchange="this.form.submit()">
+                  <label class="form-check-label d-flex justify-content-between pe-2" for="brand_{{ b.id }}">
+                    <span>{{ b.name }}</span>
+                    <small class="text-muted">({{ b.products.count }})</small>
+                  </label>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- RAM Filter -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-dark mb-2">RAM</h6>
+            <div class="d-flex flex-wrap gap-1">
+              {% for ram_opt in "8 GB,12 GB,16 GB"|make_list|slice:":3" %}
+              {% endfor %}
+              <div class="form-check form-check-inline m-0 me-1 mb-1">
+                <input class="btn-check" type="radio" name="ram" id="ram_8" value="8 GB" {% if selected_ram == '8 GB' %}checked{% endif %} onchange="this.form.submit()">
+                <label class="btn btn-sm btn-outline-secondary rounded-pill px-3" for="ram_8">8GB</label>
+              </div>
+              <div class="form-check form-check-inline m-0 me-1 mb-1">
+                <input class="btn-check" type="radio" name="ram" id="ram_12" value="12 GB" {% if selected_ram == '12 GB' %}checked{% endif %} onchange="this.form.submit()">
+                <label class="btn btn-sm btn-outline-secondary rounded-pill px-3" for="ram_12">12GB</label>
+              </div>
+              <div class="form-check form-check-inline m-0 mb-1">
+                <input class="btn-check" type="radio" name="ram" id="ram_16" value="16 GB" {% if selected_ram == '16 GB' %}checked{% endif %} onchange="this.form.submit()">
+                <label class="btn btn-sm btn-outline-secondary rounded-pill px-3" for="ram_16">16GB</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Storage Filter -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-dark mb-2">Internal Storage</h6>
+            <div class="d-flex flex-wrap gap-1">
+              <div class="form-check form-check-inline m-0 me-1 mb-1">
+                <input class="btn-check" type="radio" name="storage" id="st_128" value="128 GB" {% if selected_storage == '128 GB' %}checked{% endif %} onchange="this.form.submit()">
+                <label class="btn btn-sm btn-outline-secondary rounded-pill px-2" for="st_128">128GB</label>
+              </div>
+              <div class="form-check form-check-inline m-0 me-1 mb-1">
+                <input class="btn-check" type="radio" name="storage" id="st_256" value="256 GB" {% if selected_storage == '256 GB' %}checked{% endif %} onchange="this.form.submit()">
+                <label class="btn btn-sm btn-outline-secondary rounded-pill px-2" for="st_256">256GB</label>
+              </div>
+              <div class="form-check form-check-inline m-0 me-1 mb-1">
+                <input class="btn-check" type="radio" name="storage" id="st_512" value="512 GB" {% if selected_storage == '512 GB' %}checked{% endif %} onchange="this.form.submit()">
+                <label class="btn btn-sm btn-outline-secondary rounded-pill px-2" for="st_512">512GB</label>
+              </div>
+              <div class="form-check form-check-inline m-0 mb-1">
+                <input class="btn-check" type="radio" name="storage" id="st_1tb" value="1 TB" {% if selected_storage == '1 TB' %}checked{% endif %} onchange="this.form.submit()">
+                <label class="btn btn-sm btn-outline-secondary rounded-pill px-2" for="st_1tb">1TB</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Price Range -->
+          <div class="mb-3">
+            <h6 class="fw-bold text-dark mb-2">Price Range</h6>
+            <div class="row g-2">
+              <div class="col-6">
+                <input type="number" class="form-control form-control-sm green-input" name="min_price" placeholder="Min ₹" value="{{ min_price|default:'' }}">
+              </div>
+              <div class="col-6">
+                <input type="number" class="form-control form-control-sm green-input" name="max_price" placeholder="Max ₹" value="{{ max_price|default:'' }}">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-sm btn-emerald w-100 mt-2 rounded-pill">Apply Price</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Product Grid Column -->
+    <div class="col-lg-9">
+      <!-- Sort & Active Filters Toolbar -->
+      <div class="bg-white p-3 rounded-4 shadow-sm border mb-4 d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <span class="text-muted fw-semibold" style="font-size: 0.9rem;">Sort By:</span>
+          <select class="form-select form-select-sm green-input w-auto" onchange="location = this.value;">
+            <option value="?sort=newest" {% if current_sort == 'newest' %}selected{% endif %}>✨ Newest Arrivals</option>
+            <option value="?sort=price_low" {% if current_sort == 'price_low' %}selected{% endif %}>💰 Price: Low to High</option>
+            <option value="?sort=price_high" {% if current_sort == 'price_high' %}selected{% endif %}>💎 Price: High to Low</option>
+            <option value="?sort=rating" {% if current_sort == 'rating' %}selected{% endif %}>⭐ Highest Rated</option>
+            <option value="?sort=popular" {% if current_sort == 'popular' %}selected{% endif %}>🔥 Most Popular</option>
+          </select>
+        </div>
+
+        {% if search_query %}
+          <span class="badge bg-emerald-100 text-emerald-800 p-2 rounded-pill" style="background: #D1FAE5; color: #065F46;">
+            Search: "{{ search_query }}" <a href="{% url 'store:product_list' %}" class="text-danger ms-1"><i class="fa-solid fa-xmark"></i></a>
+          </span>
+        {% endif %}
+      </div>
+
+      <!-- Products Cards -->
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+        {% for product in page_obj %}
+          <div class="col">
+            <div class="gp-card">
+              <!-- Wishlist Toggle -->
+              {% if user.is_authenticated %}
+                <button class="gp-wishlist-btn ajax-wishlist-btn" data-product-id="{{ product.id }}" title="Wishlist">
+                  <i class="fa-regular fa-heart"></i>
+                </button>
+              {% endif %}
+
+              <!-- Image & Badges -->
+              <div class="gp-card-img-wrap">
+                <div class="position-absolute top-0 start-0 m-2 d-flex flex-column gap-1">
+                  {% if product.is_5g %}
+                    <span class="badge badge-5g">5G</span>
+                  {% endif %}
+                  {% if product.get_discount_percentage > 0 %}
+                    <span class="badge badge-discount">-{{ product.get_discount_percentage }}%</span>
+                  {% endif %}
+                </div>
+                <a href="{{ product.get_absolute_url }}">
+                  <img src="{{ product.get_image_url }}" alt="{{ product.name }}" class="gp-card-img">
+                </a>
+              </div>
+
+              <!-- Product Details -->
+              <div class="p-3 d-flex flex-column flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="text-muted fw-bold text-uppercase" style="font-size: 0.72rem;">{{ product.brand.name }}</span>
+                  <span class="text-warning fw-bold" style="font-size: 0.82rem;">
+                    <i class="fa-solid fa-star"></i> {{ product.rating }}
+                  </span>
+                </div>
+
+                <h6 class="fw-bold mb-1">
+                  <a href="{{ product.get_absolute_url }}" class="text-dark text-decoration-none text-truncate d-block">
+                    {{ product.name }}
+                  </a>
+                </h6>
+
+                <p class="text-muted small mb-2" style="font-size: 0.8rem; line-height: 1.4; height: 36px; overflow: hidden;">
+                  {{ product.short_description }}
+                </p>
+
+                <!-- Specs Chips -->
+                {% if product.specs %}
+                  <div class="d-flex flex-wrap gap-1 mb-3">
+                    <span class="gp-specs-pill"><i class="fa-solid fa-microchip text-emerald-600"></i> {{ product.specs.ram }}</span>
+                    <span class="gp-specs-pill"><i class="fa-solid fa-hard-drive text-emerald-600"></i> {{ product.specs.storage }}</span>
+                  </div>
+                {% endif %}
+
+                <!-- Price & Add Button -->
+                <div class="mt-auto pt-2 d-flex justify-content-between align-items-center border-top">
+                  <div>
+                    <div class="fs-5 fw-bold text-success" style="color: #059669;">
+                      ₹{{ product.get_current_price }}
+                    </div>
+                    {% if product.discount_price %}
+                      <small class="text-muted text-decoration-line-through">₹{{ product.price }}</small>
+                    {% endif %}
+                  </div>
+
+                  <form method="POST" action="{% url 'store:add_to_cart' product.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="btn btn-sm btn-emerald rounded-pill px-3" title="Add to Cart">
+                      <i class="fa-solid fa-cart-plus me-1"></i> Add
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="col-12 text-center py-5">
+            <div class="p-5 bg-white rounded-4 shadow-sm border text-center">
+              <i class="fa-solid fa-mobile-screen text-muted display-4 mb-3"></i>
+              <h5>No smartphones match your filter criteria</h5>
+              <p class="text-muted">Try clearing some filters or searching for another model.</p>
+              <a href="{% url 'store:product_list' %}" class="btn btn-emerald rounded-pill px-4">Reset Filters</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Pagination -->
+      {% if page_obj.has_other_pages %}
+        <nav class="mt-5" aria-label="Page navigation">
+          <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link text-emerald-700" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+              </li>
+            {% endif %}
+
+            {% for p in page_obj.paginator.page_range %}
+              <li class="page-item {% if page_obj.number == p %}active{% endif %}">
+                <a class="page-link {% if page_obj.number == p %}bg-emerald-600 border-emerald-600 text-white{% else %}text-emerald-700{% endif %}" href="?page={{ p }}" style="{% if page_obj.number == p %}background: #10B981; border-color: #10B981;{% endif %}">{{ p }}</a>
+              </li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link text-emerald-700" href="?page={{ page_obj.next_page_number }}">Next</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

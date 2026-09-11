@@ -1,0 +1,668 @@
+/* ==========================================================================
+   GreenPulse Mobile Store - Ultra Modern Green & White Theme
+   Colors: Emerald Green (#10B981, #059669), Deep Forest (#064E3B, #022C22),
+           Mint Frost (#ECFDF5, #F0FDF4), Clean White (#FFFFFF, #F8FAFC)
+   ========================================================================== */
+
+:root {
+  --gp-primary: #10B981;
+  --gp-primary-dark: #059669;
+  --gp-primary-deep: #064E3B;
+  --gp-primary-darker: #022C22;
+  --gp-primary-light: #34D399;
+  --gp-primary-subtle: #A7F3D0;
+  --gp-mint-bg: #F0FDF4;
+  --gp-mint-card: #ECFDF5;
+  --gp-white: #FFFFFF;
+  --gp-slate-50: #F8FAFC;
+  --gp-slate-100: #F1F5F9;
+  --gp-slate-200: #E2E8F0;
+  --gp-slate-600: #475569;
+  --gp-slate-700: #334155;
+  --gp-slate-800: #1E293B;
+  --gp-slate-900: #0F172A;
+  
+  --gp-shadow-sm: 0 2px 4px rgba(16, 185, 129, 0.06);
+  --gp-shadow-md: 0 8px 24px rgba(16, 185, 129, 0.12);
+  --gp-shadow-lg: 0 16px 36px rgba(16, 185, 129, 0.16);
+  --gp-glow: 0 0 20px rgba(16, 185, 129, 0.35);
+  --gp-radius-sm: 8px;
+  --gp-radius-md: 14px;
+  --gp-radius-lg: 20px;
+  --gp-radius-full: 9999px;
+  --gp-transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Background Texture */
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #F8FAFC;
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.05) 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(5, 150, 105, 0.06) 0%, transparent 45%),
+    linear-gradient(180deg, #FFFFFF 0%, #F0FDF4 350px, #F8FAFC 100%);
+  background-attachment: fixed;
+  color: var(--gp-slate-800);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Subtle Geometric Texture Overlay */
+.green-texture-bg {
+  background-color: var(--gp-primary-deep);
+  background-image: 
+    radial-gradient(rgba(16, 185, 129, 0.25) 1px, transparent 1px),
+    radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+}
+
+/* Typography & Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: var(--gp-slate-900);
+  letter-spacing: -0.02em;
+}
+
+/* -------------------------------------------------------------
+   Navigation Bar
+   ------------------------------------------------------------- */
+.gp-navbar {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  transition: var(--gp-transition);
+  padding: 0.75rem 0;
+}
+
+.gp-brand-logo {
+  font-weight: 800;
+  font-size: 1.45rem;
+  background: linear-gradient(135deg, #064E3B 0%, #059669 50%, #10B981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gp-brand-icon {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: white;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.nav-link {
+  font-weight: 600;
+  color: var(--gp-slate-700) !important;
+  padding: 0.5rem 0.85rem !important;
+  border-radius: var(--gp-radius-sm);
+  transition: var(--gp-transition);
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--gp-primary-dark) !important;
+  background-color: var(--gp-mint-card);
+}
+
+/* Search bar in Navbar */
+.gp-search-box {
+  position: relative;
+  min-width: 260px;
+}
+
+.gp-search-input {
+  border-radius: var(--gp-radius-full);
+  border: 1.5px solid var(--gp-slate-200);
+  padding: 0.5rem 1rem 0.5rem 2.4rem;
+  font-size: 0.9rem;
+  background: #FFFFFF;
+  transition: var(--gp-transition);
+}
+
+.gp-search-input:focus {
+  border-color: var(--gp-primary);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+  outline: none;
+}
+
+.gp-search-icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gp-slate-400);
+  pointer-events: none;
+}
+
+/* Cart Icon Badge */
+.gp-cart-badge-btn {
+  position: relative;
+  background: var(--gp-mint-card);
+  color: var(--gp-primary-dark);
+  border: 1.5px solid rgba(16, 185, 129, 0.3);
+  border-radius: var(--gp-radius-full);
+  padding: 0.45rem 1rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: var(--gp-transition);
+  text-decoration: none;
+}
+
+.gp-cart-badge-btn:hover {
+  background: var(--gp-primary);
+  color: #FFFFFF;
+  border-color: var(--gp-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+}
+
+.gp-cart-counter {
+  background: var(--gp-primary-deep);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+/* -------------------------------------------------------------
+   Buttons & Badges
+   ------------------------------------------------------------- */
+.btn-emerald {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  color: #FFFFFF;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--gp-radius-md);
+  padding: 0.65rem 1.4rem;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
+  transition: var(--gp-transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-emerald:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-outline-emerald {
+  background: #FFFFFF;
+  color: var(--gp-primary-dark);
+  border: 2px solid var(--gp-primary);
+  font-weight: 600;
+  border-radius: var(--gp-radius-md);
+  padding: 0.6rem 1.3rem;
+  transition: var(--gp-transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-outline-emerald:hover {
+  background: var(--gp-primary);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
+}
+
+.btn-forest {
+  background: var(--gp-primary-deep);
+  color: #FFFFFF;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--gp-radius-md);
+  padding: 0.65rem 1.4rem;
+  transition: var(--gp-transition);
+}
+
+.btn-forest:hover {
+  background: var(--gp-primary-darker);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+}
+
+/* Badges */
+.badge-emerald {
+  background: var(--gp-mint-card);
+  color: var(--gp-primary-dark);
+  border: 1px solid var(--gp-primary-subtle);
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--gp-radius-full);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+.badge-5g {
+  background: linear-gradient(135deg, #10B981, #064E3B);
+  color: white;
+  font-weight: 800;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--gp-radius-full);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+}
+
+.badge-discount {
+  background: #DC2626;
+  color: white;
+  font-weight: 800;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--gp-radius-full);
+  font-size: 0.75rem;
+}
+
+/* -------------------------------------------------------------
+   Hero Banner Section
+   ------------------------------------------------------------- */
+.gp-hero {
+  position: relative;
+  background: linear-gradient(135deg, #022C22 0%, #064E3B 40%, #065F46 100%);
+  border-radius: var(--gp-radius-lg);
+  color: #FFFFFF;
+  overflow: hidden;
+  box-shadow: var(--gp-shadow-lg);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.gp-hero::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.gp-hero-badge {
+  background: rgba(16, 185, 129, 0.25);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  color: #A7F3D0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  border-radius: var(--gp-radius-full);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.gp-hero-phone-img {
+  max-height: 380px;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.5));
+  transition: transform 0.4s ease;
+  animation: floatPhone 4s ease-in-out infinite;
+}
+
+@keyframes floatPhone {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(1deg); }
+}
+
+/* -------------------------------------------------------------
+   Product Cards & Grid
+   ------------------------------------------------------------- */
+.gp-card {
+  background: #FFFFFF;
+  border: 1.5px solid rgba(16, 185, 129, 0.12);
+  border-radius: var(--gp-radius-md);
+  transition: var(--gp-transition);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.gp-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--gp-primary);
+  box-shadow: var(--gp-shadow-md);
+}
+
+.gp-card-img-wrap {
+  background: linear-gradient(180deg, #F8FAFC 0%, #F0FDF4 100%);
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.08);
+}
+
+.gp-card-img {
+  height: 200px;
+  max-width: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.gp-card:hover .gp-card-img {
+  transform: scale(1.05);
+}
+
+.gp-wishlist-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--gp-slate-200);
+  border-radius: var(--gp-radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gp-slate-600);
+  cursor: pointer;
+  transition: var(--gp-transition);
+  z-index: 2;
+}
+
+.gp-wishlist-btn:hover, .gp-wishlist-btn.active {
+  background: #FEE2E2;
+  color: #EF4444;
+  border-color: #FCA5A5;
+  transform: scale(1.1);
+}
+
+.gp-specs-pill {
+  font-size: 0.76rem;
+  background: var(--gp-slate-100);
+  color: var(--gp-slate-700);
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------
+   Dedicated Cart Page Styles
+   ------------------------------------------------------------- */
+.gp-cart-box {
+  background: #FFFFFF;
+  border-radius: var(--gp-radius-md);
+  border: 1.5px solid rgba(16, 185, 129, 0.14);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  padding: 1.75rem;
+}
+
+.gp-cart-item-row {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem 0;
+  border-bottom: 1px dashed var(--gp-slate-200);
+}
+
+.gp-cart-item-row:last-child {
+  border-bottom: none;
+}
+
+.gp-cart-img {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  background: #F8FAFC;
+  border-radius: var(--gp-radius-sm);
+  padding: 0.4rem;
+  border: 1px solid var(--gp-slate-200);
+}
+
+.gp-qty-group {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid var(--gp-slate-200);
+  border-radius: var(--gp-radius-full);
+  background: #FFFFFF;
+  overflow: hidden;
+}
+
+.gp-qty-btn {
+  background: none;
+  border: none;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--gp-slate-700);
+  transition: var(--gp-transition);
+}
+
+.gp-qty-btn:hover {
+  background: var(--gp-mint-card);
+  color: var(--gp-primary-dark);
+}
+
+.gp-qty-val {
+  min-width: 36px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* Shipping Progress Bar */
+.gp-shipping-meter {
+  background: #ECFDF5;
+  border: 1px solid var(--gp-primary-subtle);
+  border-radius: var(--gp-radius-md);
+  padding: 1rem;
+}
+
+.progress-green {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--gp-slate-200);
+  overflow: hidden;
+}
+
+.progress-bar-emerald {
+  background: linear-gradient(90deg, #10B981 0%, #059669 100%);
+  transition: width 0.6s ease;
+}
+
+/* -------------------------------------------------------------
+   Checkout & Order Delivery Scheduling UI
+   ------------------------------------------------------------- */
+.gp-checkout-card {
+  background: #FFFFFF;
+  border-radius: var(--gp-radius-md);
+  border: 1.5px solid rgba(16, 185, 129, 0.16);
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.gp-step-badge {
+  width: 32px;
+  height: 32px;
+  background: var(--gp-primary);
+  color: white;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  margin-right: 0.6rem;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+}
+
+.gp-slot-card {
+  border: 2px solid var(--gp-slate-200);
+  border-radius: var(--gp-radius-md);
+  padding: 0.9rem 1.1rem;
+  cursor: pointer;
+  transition: var(--gp-transition);
+  background: #FFFFFF;
+}
+
+.gp-slot-card:hover {
+  border-color: var(--gp-primary);
+  background: var(--gp-mint-card);
+}
+
+.gp-slot-card.selected,
+input[type="radio"]:checked + .gp-slot-card {
+  border-color: var(--gp-primary);
+  background: var(--gp-mint-card);
+  box-shadow: 0 0 0 2px var(--gp-primary);
+}
+
+.green-input {
+  border: 1.5px solid var(--gp-slate-200);
+  border-radius: var(--gp-radius-sm);
+  padding: 0.65rem 0.9rem;
+  transition: var(--gp-transition);
+}
+
+.green-input:focus {
+  border-color: var(--gp-primary);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
+  outline: none;
+}
+
+/* -------------------------------------------------------------
+   Admin Dashboard & Dispatch Scheduling Styles
+   ------------------------------------------------------------- */
+.gp-admin-stat-card {
+  background: #FFFFFF;
+  border-radius: var(--gp-radius-md);
+  border: 1.5px solid rgba(16, 185, 129, 0.16);
+  padding: 1.4rem;
+  transition: var(--gp-transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.gp-admin-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--gp-shadow-md);
+  border-color: var(--gp-primary);
+}
+
+.gp-admin-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--gp-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  background: var(--gp-mint-card);
+  color: var(--gp-primary-dark);
+}
+
+.gp-schedule-badge {
+  background: #E0F2FE;
+  color: #0369A1;
+  border: 1px solid #BAE6FD;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+
+/* Order Tracking Timeline */
+.gp-timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.gp-timeline::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 11px;
+  width: 3px;
+  background: var(--gp-slate-200);
+}
+
+.gp-timeline-item {
+  position: relative;
+  margin-bottom: 1.8rem;
+}
+
+.gp-timeline-point {
+  position: absolute;
+  left: -2rem;
+  top: 2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 3px solid var(--gp-slate-300);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: var(--gp-transition);
+}
+
+.gp-timeline-item.completed .gp-timeline-point {
+  background: var(--gp-primary);
+  border-color: var(--gp-primary-deep);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.gp-timeline-item.active .gp-timeline-point {
+  background: #FFFFFF;
+  border-color: var(--gp-primary);
+  animation: pulseGreen 2s infinite;
+}
+
+@keyframes pulseGreen {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* -------------------------------------------------------------
+   Footer & Toast
+   ------------------------------------------------------------- */
+.gp-footer {
+  background: #022C22;
+  color: #E2E8F0;
+  margin-top: auto;
+  border-top: 3px solid var(--gp-primary);
+}
+
+.gp-footer-link {
+  color: #94A3B8;
+  text-decoration: none;
+  transition: var(--gp-transition);
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.gp-footer-link:hover {
+  color: #34D399;
+  transform: translateX(3px);
+}
+
+.toast-container {
+  z-index: 1090;
+}

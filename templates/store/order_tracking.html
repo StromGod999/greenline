@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static humanize %}
+
+{% block title %}Track Order #{{ order.order_number }} - GreenPulse{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb" style="font-size: 0.88rem;">
+      <li class="breadcrumb-item"><a href="{% url 'store:home' %}" class="text-emerald-700 text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Track Order #{{ order.order_number }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- Live Tracker Stepper (Left) -->
+    <div class="col-lg-8">
+      <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border mb-4" style="border-color: rgba(16, 185, 129, 0.25) !important;">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom">
+          <div>
+            <h4 class="fw-bold mb-1">Order Status Tracker</h4>
+            <div class="text-muted small">Tracking ID: <span class="font-monospace fw-bold text-emerald-800">{{ order.order_number }}</span></div>
+          </div>
+          <div>
+            <span class="badge {{ order.get_status_badge_class }} fs-6 px-3 py-2 rounded-pill">
+              {{ order.order_status }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Scheduled Delivery Spotlight Banner -->
+        <div class="p-3 mb-5 rounded-4" style="background: #ECFDF5; border: 1.5px solid #A7F3D0;">
+          <div class="d-flex align-items-center gap-3">
+            <i class="fa-solid fa-calendar-check text-emerald-600 fs-2" style="color: #10B981;"></i>
+            <div>
+              <div class="fw-bold text-emerald-950">Scheduled Delivery Arrival</div>
+              <div class="text-emerald-800" style="color: #065F46;">
+                <strong>{{ order.scheduled_date|date:"l, F d, Y" }}</strong> • Slot: <strong>{{ order.delivery_time_slot }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vertical Timeline Stepper -->
+        <div class="gp-timeline">
+          <!-- Step 1: Placed -->
+          <div class="gp-timeline-item {% if current_index >= 0 %}completed{% endif %}">
+            <div class="gp-timeline-point">
+              {% if current_index >= 0 %}<i class="fa-solid fa-check text-white" style="font-size: 10px;"></i>{% endif %}
+            </div>
+            <h6 class="fw-bold mb-1 text-dark">Order Placed</h6>
+            <p class="text-muted small mb-0">Your order has been received and logged in our system.</p>
+            <small class="text-muted" style="font-size: 0.75rem;">{{ order.created_at|date:"M d, Y, h:i A" }}</small>
+          </div>
+
+          <!-- Step 2: Scheduled -->
+          <div class="gp-timeline-item {% if current_index >= 1 %}completed{% elif current_index == 0 %}active{% endif %}">
+            <div class="gp-timeline-point">
+              {% if current_index >= 1 %}<i class="fa-solid fa-check text-white" style="font-size: 10px;"></i>{% endif %}
+            </div>
+            <h6 class="fw-bold mb-1 text-dark">Delivery Scheduled & Confirmed</h6>
+            <p class="text-muted small mb-0">Scheduled for delivery on {{ order.scheduled_date }} ({{ order.delivery_time_slot }}).</p>
+          </div>
+
+          <!-- Step 3: Processing -->
+          <div class="gp-timeline-item {% if current_index >= 2 %}completed{% elif current_index == 1 %}active{% endif %}">
+            <div class="gp-timeline-point">
+              {% if current_index >= 2 %}<i class="fa-solid fa-check text-white" style="font-size: 10px;"></i>{% endif %}
+            </div>
+            <h6 class="fw-bold mb-1 text-dark">Processing & Secure Packing</h6>
+            <p class="text-muted small mb-0">Smartphone verified, sealed with tamper-proof GreenPulse security tape.</p>
+          </div>
+
+          <!-- Step 4: Shipped -->
+          <div class="gp-timeline-item {% if current_index >= 3 %}completed{% elif current_index == 2 %}active{% endif %}">
+            <div class="gp-timeline-point">
+              {% if current_index >= 3 %}<i class="fa-solid fa-check text-white" style="font-size: 10px;"></i>{% endif %}
+            </div>
+            <h6 class="fw-bold mb-1 text-dark">Dispatched / In Transit</h6>
+            <p class="text-muted small mb-0">
+              Handed over to priority dispatch courier.
+              {% if order.tracking_number %}Tracking AWB: <code class="text-dark">{{ order.tracking_number }}</code>{% endif %}
+            </p>
+          </div>
+
+          <!-- Step 5: Out for Delivery -->
+          <div class="gp-timeline-item {% if current_index >= 4 %}completed{% elif current_index == 3 %}active{% endif %}">
+            <div class="gp-timeline-point">
+              {% if current_index >= 4 %}<i class="fa-solid fa-check text-white" style="font-size: 10px;"></i>{% endif %}
+            </div>
+            <h6 class="fw-bold mb-1 text-dark">Out for Delivery</h6>
+            <p class="text-muted small mb-0">Delivery agent is in your area for the scheduled time slot.</p>
+          </div>
+
+          <!-- Step 6: Delivered -->
+          <div class="gp-timeline-item {% if current_index >= 5 %}completed{% endif %}" style="margin-bottom: 0;">
+            <div class="gp-timeline-point">
+              {% if current_index >= 5 %}<i class="fa-solid fa-check text-white" style="font-size: 10px;"></i>{% endif %}
+            </div>
+            <h6 class="fw-bold mb-1 text-dark">Delivered</h6>
+            <p class="text-muted small mb-0">Package successfully handed over to customer.</p>
+          </div>
+        </div>
+
+        {% if order.dispatch_notes %}
+          <div class="mt-4 p-3 bg-light rounded-3 border">
+            <strong class="small text-dark d-block mb-1"><i class="fa-solid fa-note-sticky text-emerald-600 me-1"></i> Warehouse & Dispatch Remarks:</strong>
+            <div class="small text-secondary">{{ order.dispatch_notes }}</div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Order Items & Support (Right) -->
+    <div class="col-lg-4">
+      <div class="bg-white p-4 rounded-4 shadow-sm border mb-4" style="border-color: rgba(16, 185, 129, 0.2) !important;">
+        <h5 class="fw-bold text-dark mb-3">Order Details</h5>
+        
+        <div class="mb-3">
+          {% for item in order.items.all %}
+            <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom">
+              <img src="{{ item.product_image_url }}" alt="{{ item.product_name }}" style="width: 44px; height: 44px; object-fit: contain;">
+              <div class="flex-grow-1">
+                <div class="fw-bold text-dark small">{{ item.product_name }}</div>
+                <small class="text-muted">{{ item.color }} • {{ item.storage }} (x{{ item.quantity }})</small>
+              </div>
+              <div class="fw-bold text-dark small">₹{{ item.total_price }}</div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="d-flex justify-content-between mb-2 small">
+          <span class="text-muted">Payment:</span>
+          <span class="fw-bold text-dark">{{ order.get_payment_method_display }} ({{ order.payment_status }})</span>
+        </div>
+
+        <div class="d-flex justify-content-between mb-3 small">
+          <span class="text-muted">Total Paid:</span>
+          <span class="fw-extrabold text-emerald-800">₹{{ order.total_amount }}</span>
+        </div>
+
+        <a href="{% url 'store:invoice' order.order_number %}" class="btn btn-outline-emerald w-100 rounded-pill btn-sm" target="_blank">
+          <i class="fa-solid fa-file-invoice me-1"></i> View Tax Invoice
+        </a>
+      </div>
+
+      <!-- Support Card -->
+      <div class="p-4 rounded-4 text-white" style="background: #022C22;">
+        <h6 class="fw-bold text-emerald-300 mb-2" style="color: #6EE7B7;"><i class="fa-solid fa-headset me-2"></i> Need Delivery Support?</h6>
+        <p class="small text-slate-300 mb-3" style="color: #CBD5E1;">Need to reschedule your delivery slot or change delivery instructions?</p>
+        <div class="small fw-bold"><i class="fa-solid fa-phone me-1"></i> {{ STORE_PHONE }}</div>
+        <div class="small text-muted"><i class="fa-solid fa-envelope me-1"></i> {{ STORE_EMAIL }}</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
