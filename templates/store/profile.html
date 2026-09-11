@@ -122,6 +122,9 @@
                   <a href="{% url 'store:invoice' order.order_number %}" class="btn btn-sm btn-outline-secondary rounded-pill" target="_blank">
                     Invoice
                   </a>
+                  <a href="{% url 'store:invoice_download' order.order_number %}" class="btn btn-sm btn-outline-emerald rounded-pill" title="Download PDF Receipt">
+                    <i class="fa-solid fa-download me-1"></i> Receipt
+                  </a>
                 </div>
               </div>
             </div>
@@ -154,9 +157,12 @@
                     <td class="small"><strong>{{ ord.scheduled_date|date:"M d" }}</strong><br><small class="text-muted">{{ ord.delivery_time_slot }}</small></td>
                     <td><span class="badge {{ ord.get_status_badge_class }}">{{ ord.order_status }}</span></td>
                     <td class="fw-bold">₹{{ ord.total_amount }}</td>
-                    <td>
+                    <td class="d-flex gap-1">
                       <a href="{% url 'store:order_tracking' ord.order_number %}" class="btn btn-sm btn-light border rounded-pill p-1 px-2" title="Track">
                         <i class="fa-solid fa-eye text-emerald-600"></i>
+                      </a>
+                      <a href="{% url 'store:invoice_download' ord.order_number %}" class="btn btn-sm btn-light border rounded-pill p-1 px-2" title="Download PDF Receipt">
+                        <i class="fa-solid fa-download text-emerald-600"></i>
                       </a>
                     </td>
                   </tr>

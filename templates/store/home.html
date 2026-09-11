@@ -256,7 +256,7 @@
         <div class="col">
           <div class="gp-card">
             <div class="gp-card-img-wrap">
-              <span class="position-absolute top-0 start-0 m-2 badge badge-discount">Save ₹{{ product.price|floatformat:0 }}</span>
+              <span class="position-absolute top-0 start-0 m-2 badge badge-discount">Save ₹{{ product.get_savings_amount|floatformat:0 }}</span>
               <a href="{{ product.get_absolute_url }}">
                 <img src="{{ product.get_image_url }}" alt="{{ product.name }}" class="gp-card-img">
               </a>

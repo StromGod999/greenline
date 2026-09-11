@@ -25,6 +25,7 @@ urlpatterns = [
     path('order/success/<str:order_number>/', views.order_success_view, name='order_success'),
     path('order/track/<str:order_number>/', views.order_tracking_view, name='order_tracking'),
     path('order/invoice/<str:order_number>/', views.invoice_view, name='invoice'),
+    path('order/invoice/<str:order_number>/download/', views.invoice_download_view, name='invoice_download'),
 
     # Customer Wishlist & Profile
     path('wishlist/', views.wishlist_view, name='wishlist'),

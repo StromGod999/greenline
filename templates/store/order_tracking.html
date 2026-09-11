@@ -141,8 +141,11 @@
           <span class="fw-extrabold text-emerald-800">₹{{ order.total_amount }}</span>
         </div>
 
-        <a href="{% url 'store:invoice' order.order_number %}" class="btn btn-outline-emerald w-100 rounded-pill btn-sm" target="_blank">
+        <a href="{% url 'store:invoice' order.order_number %}" class="btn btn-outline-emerald w-100 rounded-pill btn-sm mb-2" target="_blank">
           <i class="fa-solid fa-file-invoice me-1"></i> View Tax Invoice
+        </a>
+        <a href="{% url 'store:invoice_download' order.order_number %}" class="btn btn-emerald w-100 rounded-pill btn-sm">
+          <i class="fa-solid fa-download me-1"></i> Download Receipt (PDF)
         </a>
       </div>
 

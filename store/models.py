@@ -88,6 +88,11 @@ class Product(models.Model):
             return int(percent)
         return 0
 
+    def get_savings_amount(self):
+        if self.discount_price and self.discount_price < self.price:
+            return self.price - self.discount_price
+        return Decimal('0.00')
+
     def in_stock(self):
         return self.stock > 0
 
@@ -278,11 +283,11 @@ class Order(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.order_number:
-            self.order_number = f"GPM-{uuid.uuid4().hex[:8].upper()}"
+            self.order_number = f"GRN-{uuid.uuid4().hex[:10].upper()}"
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Order #{self.order_number} - {self.full_name} (${self.total_amount})"
+        return f"Order #{self.order_number} - {self.full_name} (₹{self.total_amount})"
 
     def get_status_badge_class(self):
         mapping = {

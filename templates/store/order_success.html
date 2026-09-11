@@ -85,7 +85,10 @@
         <!-- Action Links -->
         <div class="d-flex flex-wrap justify-content-center gap-3">
           <a href="{% url 'store:invoice' order.order_number %}" class="btn btn-outline-secondary rounded-pill px-4" target="_blank">
-            <i class="fa-solid fa-file-invoice me-1"></i> Print / Download Invoice
+            <i class="fa-solid fa-file-invoice me-1"></i> View Invoice
+          </a>
+          <a href="{% url 'store:invoice_download' order.order_number %}" class="btn btn-outline-emerald rounded-pill px-4">
+            <i class="fa-solid fa-download me-1"></i> Download Receipt (PDF)
           </a>
           <a href="{% url 'store:home' %}" class="btn btn-emerald rounded-pill px-4">
             <i class="fa-solid fa-house me-1"></i> Return to Storefront

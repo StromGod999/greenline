@@ -157,7 +157,10 @@ LOGOUT_REDIRECT_URL = 'store:home'
 ACCOUNT_ADAPTER = 'store.adapters.TwoFactorAccountAdapter'
 ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_SIGNUP_FIELDS = ['username*', 'email*', 'password1*', 'password2*']
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# 'optional': verification emails are still sent, but a failed/undelivered
+# email (e.g. no verified sending domain configured in Resend yet) never
+# locks a real customer out of signing in or checking out.
+ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION', 'optional')
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 ACCOUNT_LOGOUT_ON_GET = True
 

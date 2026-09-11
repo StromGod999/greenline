@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Page Not Found - Greenline Mobiles{% endblock %}
+{% block content %}
+<div class="container py-5 text-center">
+  <div class="py-5">
+    <div class="display-1 fw-extrabold text-emerald-600" style="color:#10B981;">404</div>
+    <h2 class="fw-bold text-dark mb-3">Looks like this page took a wrong turn.</h2>
+    <p class="text-muted mb-4">The page you're looking for doesn't exist or may have been moved.</p>
+    <a href="{% url 'store:home' %}" class="btn btn-emerald btn-lg rounded-pill px-4">
+      <i class="fa-solid fa-house me-2"></i> Back to Home
+    </a>
+  </div>
+</div>
+{% endblock %}

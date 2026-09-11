@@ -22,7 +22,7 @@ from .models import (
 from .forms import CheckoutForm, ReviewForm
 from .utils import (
     get_or_create_cart, create_razorpay_order, verify_razorpay_signature,
-    send_phone_otp, verify_phone_otp_code,
+    send_phone_otp, verify_phone_otp_code, generate_invoice_pdf,
 )
 
 
@@ -372,7 +372,7 @@ def apply_coupon(request):
                 request.session['coupon_code'] = code
                 messages.success(request, f"🎉 Coupon '{code}' applied! You saved {coupon.discount_percent}%.")
             else:
-                messages.error(request, f"Coupon '{code}' requires a minimum order of ${coupon.min_order_amount}.")
+                messages.error(request, f"Coupon '{code}' requires a minimum order of ₹{coupon.min_order_amount}.")
         else:
             messages.error(request, "Invalid or expired promo code. Try 'GREEN10'!")
 
@@ -393,6 +393,7 @@ def remove_coupon(request):
 # Checkout & Order Delivery Scheduling & Razorpay
 # -------------------------------------------------------------
 
+@login_required
 def checkout_view(request):
     """
     Modern checkout workflow with:
@@ -510,20 +511,25 @@ def checkout_view(request):
     return render(request, 'store/checkout.html', context)
 
 
+@login_required
 def razorpay_payment_view(request, order_number):
     """
     Dedicated Razorpay Payment Gateway page with interactive checkout,
     support for active credentials, and built-in interactive simulator.
     """
     order = get_object_or_404(Order, order_number=order_number)
+    if not user_can_access_order(request, order):
+        messages.error(request, "You don't have permission to view that order.")
+        return redirect('store:home')
 
     if order.payment_status == 'Paid':
         return redirect('store:order_success', order_number=order.order_number)
 
     amount_in_paise = int(order.total_amount * 100)
 
-    # Only provide order_id if it was created via Razorpay API (starts with order_)
-    rzp_order_id = order.razorpay_order_id if (order.razorpay_order_id and order.razorpay_order_id.startswith('order_') and not order.razorpay_order_id.startswith('order_rzp_GPM')) else ""
+    # Only provide order_id if it was created via the real Razorpay API
+    # (our local fallback IDs are prefixed "order_rzp_" and don't exist in Razorpay)
+    rzp_order_id = order.razorpay_order_id if (order.razorpay_order_id and order.razorpay_order_id.startswith('order_') and not order.razorpay_order_id.startswith('order_rzp_')) else ""
 
     context = {
         'order': order,
@@ -535,6 +541,7 @@ def razorpay_payment_view(request, order_number):
     return render(request, 'store/razorpay_payment.html', context)
 
 
+@login_required
 def razorpay_callback_view(request):
     """
     Handles payment response from Razorpay (both live POST callback & mock test verification).
@@ -555,9 +562,13 @@ def razorpay_callback_view(request):
             messages.error(request, "Order not found for verification.")
             return redirect('store:home')
 
+        if not user_can_access_order(request, order):
+            messages.error(request, "You don't have permission to update that order.")
+            return redirect('store:home')
+
         # Verify signature
         is_valid = verify_razorpay_signature(razorpay_order_id, razorpay_payment_id, razorpay_signature)
-        if is_valid or request.POST.get('mock_payment') == 'true':
+        if is_valid:
             order.payment_status = 'Paid'
             order.razorpay_payment_id = razorpay_payment_id or f"pay_mock_{order.order_number}"
             order.razorpay_signature = razorpay_signature or "sandbox_signature_verified"
@@ -575,21 +586,29 @@ def razorpay_callback_view(request):
     return redirect('store:home')
 
 
+@login_required
 def order_success_view(request, order_number):
     """
     Order confirmation view with green celebratory effects, delivery schedule,
     contact helpline, and link to printable receipt/invoice.
     """
     order = get_object_or_404(Order, order_number=order_number)
+    if not user_can_access_order(request, order):
+        messages.error(request, "You don't have permission to view that order.")
+        return redirect('store:home')
     return render(request, 'store/order_success.html', {'order': order})
 
 
+@login_required
 def order_tracking_view(request, order_number):
     """
     Visual Timeline Order Status and Scheduled Delivery Tracker.
     """
     order = get_object_or_404(Order, order_number=order_number)
-    
+    if not user_can_access_order(request, order):
+        messages.error(request, "You don't have permission to view that order.")
+        return redirect('store:home')
+
     statuses = ['Placed', 'Scheduled', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered']
     current_index = 0
     if order.order_status in statuses:
@@ -605,12 +624,33 @@ def order_tracking_view(request, order_number):
     return render(request, 'store/order_tracking.html', context)
 
 
+@login_required
 def invoice_view(request, order_number):
     """
     Clean printable tax invoice / bill receipt.
     """
     order = get_object_or_404(Order, order_number=order_number)
+    if not user_can_access_order(request, order):
+        messages.error(request, "You don't have permission to view that order.")
+        return redirect('store:home')
     return render(request, 'store/invoice.html', {'order': order})
+
+
+@login_required
+def invoice_download_view(request, order_number):
+    """
+    Generates and downloads a real PDF receipt/tax-invoice for the order
+    (as opposed to the browser's own print-to-PDF on the invoice page).
+    """
+    order = get_object_or_404(Order, order_number=order_number)
+    if not user_can_access_order(request, order):
+        messages.error(request, "You don't have permission to view that order.")
+        return redirect('store:home')
+
+    pdf_bytes = generate_invoice_pdf(order)
+    response = HttpResponse(pdf_bytes, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Greenline-Receipt-{order.order_number}.pdf"'
+    return response
 
 
 # -------------------------------------------------------------
@@ -676,6 +716,13 @@ def profile_view(request):
 
 def is_admin_or_staff(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser)
+
+
+def user_can_access_order(request, order):
+    """Only the order's owner or store staff may view/act on an order."""
+    if order.user_id is None:
+        return True
+    return request.user.is_authenticated and (request.user.id == order.user_id or is_admin_or_staff(request.user))
 
 
 @user_passes_test(is_admin_or_staff, login_url='account_login')
@@ -835,7 +882,7 @@ def admin_update_product_stock(request, product_id):
         if price is not None:
             product.price = Decimal(price)
         product.save()
-        messages.success(request, f"✓ Updated {product.name} (Stock: {product.stock}, Price: ${product.price})")
+        messages.success(request, f"✓ Updated {product.name} (Stock: {product.stock}, Price: ₹{product.price})")
 
     return redirect(request.META.get('HTTP_REFERER', 'store:admin_dashboard'))
 
