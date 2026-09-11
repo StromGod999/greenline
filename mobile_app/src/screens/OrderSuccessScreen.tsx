@@ -58,7 +58,7 @@ export const OrderSuccessScreen: React.FC<{ navigation: any; route: any }> = ({
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `📱 GreenPulse Order #${orderNumber} Confirmed!\nScheduled Delivery: ${scheduledDate || orderDetail?.scheduled_date} (${timeSlot || orderDetail?.delivery_time_slot})\nTotal Amount: ${FormatINR(totalAmount || orderDetail?.total_amount)}`,
+        message: `📱 Greenline Order #${orderNumber} Confirmed!\nScheduled Delivery: ${scheduledDate || orderDetail?.scheduled_date} (${timeSlot || orderDetail?.delivery_time_slot})\nTotal Amount: ${FormatINR(totalAmount || orderDetail?.total_amount)}`,
       });
     } catch (err) {
       console.error(err);

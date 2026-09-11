@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-GreenPulse Online Mobile Store - Python One-Click Launcher
+Greenline Online Mobile Store - Python One-Click Launcher
 Automatically prepares database migrations, runs the seeder script, and launches Django.
 """
 import os
@@ -19,7 +19,7 @@ def run_cmd(cmd_list, title=""):
 
 def main():
     print("=" * 65)
-    print("     🌿 GreenPulse Online Mobile Store (Django 2026)")
+    print("     🌿 Greenline Online Mobile Store (Django 2026)")
     print("=" * 65)
 
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -33,7 +33,7 @@ def main():
     run_cmd([sys.executable, "populate_db.py"], "Seeding initial smartphone catalog & admin")
 
     print("\n" + "=" * 65)
-    print("🚀 GreenPulse Mobile Store is Ready!")
+    print("🚀 Greenline Mobile Store is Ready!")
     print("🔗 Storefront:      http://127.0.0.1:8000/")
     print("👑 Custom Admin:    http://127.0.0.1:8000/admin-dashboard/")
     print("⚙️  Django Admin:    http://127.0.0.1:8000/admin/")

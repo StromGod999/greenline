@@ -4,21 +4,26 @@ from datetime import date, timedelta
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.forms import AuthenticationForm
 from django.db.models import Q, Count, Sum
 from django.core.paginator import Paginator
 from django.utils import timezone
 from django.utils.text import slugify
 from django.conf import settings
 
+from django.contrib.auth.models import User
+
 from .models import (
     Product, Category, Brand, ProductSpecification, ProductImage,
-    Cart, CartItem, Coupon, Order, OrderItem, Review, Wishlist
+    Cart, CartItem, Coupon, Order, OrderItem, Review, Wishlist,
+    UserProfile, PhoneOTP, LoginOTP,
 )
-from .forms import CheckoutForm, ReviewForm, UserRegisterForm
-from .utils import get_or_create_cart, create_razorpay_order, verify_razorpay_signature
+from .forms import CheckoutForm, ReviewForm
+from .utils import (
+    get_or_create_cart, create_razorpay_order, verify_razorpay_signature,
+    send_phone_otp, verify_phone_otp_code,
+)
 
 
 # -------------------------------------------------------------
@@ -673,7 +678,7 @@ def is_admin_or_staff(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 
 
-@user_passes_test(is_admin_or_staff, login_url='store:login')
+@user_passes_test(is_admin_or_staff, login_url='account_login')
 def admin_dashboard_view(request):
     """
     Custom Store Admin Dashboard:
@@ -728,7 +733,7 @@ def admin_dashboard_view(request):
     return render(request, 'store/admin_dashboard.html', context)
 
 
-@user_passes_test(is_admin_or_staff, login_url='store:login')
+@user_passes_test(is_admin_or_staff, login_url='account_login')
 def admin_add_product(request):
     """
     Adds a brand-new smartphone (with its technical specification record)
@@ -789,7 +794,7 @@ def admin_add_product(request):
     return redirect('store:admin_dashboard')
 
 
-@user_passes_test(is_admin_or_staff, login_url='store:login')
+@user_passes_test(is_admin_or_staff, login_url='account_login')
 def admin_update_order_status(request, order_id):
     """
     1-Click update for order status and delivery notes from admin panel.
@@ -816,7 +821,7 @@ def admin_update_order_status(request, order_id):
     return redirect(request.META.get('HTTP_REFERER', 'store:admin_dashboard'))
 
 
-@user_passes_test(is_admin_or_staff, login_url='store:login')
+@user_passes_test(is_admin_or_staff, login_url='account_login')
 def admin_update_product_stock(request, product_id):
     """
     Quick stock & price updater from admin panel.
@@ -836,58 +841,95 @@ def admin_update_product_stock(request, product_id):
 
 
 # -------------------------------------------------------------
-# User Authentication Views
+# Two-Factor Login Verification (email OTP via Resend) & Phone
+# Number Verification (SMS OTP via 2Factor.in)
 # -------------------------------------------------------------
 
-def register_view(request):
+def verify_2fa_view(request):
     """
-    Customer registration view with Green & White theme.
+    Second step of login for accounts with email-based 2FA enabled.
+    Triggered by TwoFactorAccountAdapter.pre_login (see store/adapters.py).
     """
-    if request.user.is_authenticated:
-        return redirect('store:home')
+    user_id = request.session.get('pending_2fa_user_id')
+    if not user_id:
+        return redirect('account_login')
 
     if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])
-            user.save()
-            login(request, user)
-            messages.success(request, f"Welcome to GreenPulse Mobile Store, {user.first_name or user.username}!")
-            return redirect('store:home')
-    else:
-        form = UserRegisterForm()
+        code = request.POST.get('code', '').strip()
+        otp = LoginOTP.objects.filter(user_id=user_id, code=code, is_used=False).order_by('-created_at').first()
 
-    return render(request, 'auth/register.html', {'form': form})
+        if otp and not otp.is_expired():
+            otp.is_used = True
+            otp.save(update_fields=['is_used'])
 
+            user = get_object_or_404(User, pk=user_id)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 
-def login_view(request):
-    """
-    Customer / Admin login view.
-    """
-    if request.user.is_authenticated:
-        return redirect('store:home')
+            redirect_url = request.session.pop('pending_2fa_redirect', '') or 'store:home'
+            del request.session['pending_2fa_user_id']
 
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
             messages.success(request, f"Welcome back, {user.get_full_name() or user.username}!")
-            next_url = request.GET.get('next') or ('store:admin_dashboard' if user.is_staff else 'store:home')
-            return redirect(next_url)
+            return redirect(redirect_url)
         else:
-            messages.error(request, "Invalid username or password.")
-    else:
-        form = AuthenticationForm()
+            messages.error(request, "That code is invalid or has expired. Please try again.")
 
-    return render(request, 'auth/login.html', {'form': form})
+    return render(request, 'auth/verify_2fa.html')
 
 
-def logout_view(request):
-    """
-    User logout.
-    """
-    logout(request)
-    messages.info(request, "You have been logged out successfully.")
-    return redirect('store:home')
+@login_required
+def toggle_2fa_view(request):
+    """Enable/disable email-based 2FA for the logged-in user."""
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    profile.two_factor_enabled = not profile.two_factor_enabled
+    profile.save(update_fields=['two_factor_enabled'])
+    messages.success(
+        request,
+        f"Two-factor authentication {'enabled' if profile.two_factor_enabled else 'disabled'}."
+    )
+    return redirect('store:profile')
+
+
+@login_required
+def send_phone_otp_view(request):
+    """Sends an SMS OTP (via 2Factor.in) to verify the user's phone number."""
+    if request.method == 'POST':
+        phone_number = request.POST.get('phone_number', '').strip()
+        if not phone_number:
+            messages.error(request, "Please enter a phone number.")
+            return redirect('store:profile')
+
+        session_id, error = send_phone_otp(phone_number)
+        if error:
+            messages.error(request, f"Could not send OTP: {error}")
+        else:
+            profile, _ = UserProfile.objects.get_or_create(user=request.user)
+            profile.phone_number = phone_number
+            profile.phone_verified = False
+            profile.save(update_fields=['phone_number', 'phone_verified'])
+
+            PhoneOTP.objects.create(user=request.user, phone_number=phone_number, session_id=session_id)
+            messages.success(request, f"An OTP has been sent to {phone_number}.")
+
+    return redirect('store:profile')
+
+
+@login_required
+def verify_phone_otp_view(request):
+    """Verifies the SMS OTP entered by the user and marks the phone as verified."""
+    if request.method == 'POST':
+        code = request.POST.get('otp', '').strip()
+        otp_obj = PhoneOTP.objects.filter(user=request.user, is_used=False).order_by('-created_at').first()
+
+        if otp_obj and not otp_obj.is_expired() and verify_phone_otp_code(otp_obj.session_id, code):
+            otp_obj.is_used = True
+            otp_obj.save(update_fields=['is_used'])
+
+            profile, _ = UserProfile.objects.get_or_create(user=request.user)
+            profile.phone_verified = True
+            profile.save(update_fields=['phone_verified'])
+
+            messages.success(request, "Your phone number has been verified!")
+        else:
+            messages.error(request, "Invalid or expired OTP. Please try again.")
+
+    return redirect('store:profile')

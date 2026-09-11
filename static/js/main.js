@@ -1,5 +1,5 @@
 /**
- * GreenPulse Mobile Store - Main Frontend Interactions
+ * Greenline Mobile Store - Main Frontend Interactions
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const csrftoken = getCookie('csrftoken');
 
   // Dynamic Toast Trigger
-  window.showGreenToast = function(message, title = 'GreenPulse Notification') {
+  window.showGreenToast = function(message, title = 'Greenline Notification') {
     const container = document.querySelector('.toast-container') || createToastContainer();
     const toastId = 'toast-' + Date.now();
     const html = `

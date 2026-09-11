@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "GreenPulse Mobiles India",
-    "slug": "greenpulse-mobiles",
+    "name": "Greenline Mobiles India",
+    "slug": "greenline-mobiles",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
@@ -14,7 +14,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.greenpulse.mobilestore",
+      "bundleIdentifier": "com.greenline.mobilestore",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
@@ -22,7 +22,7 @@
       }
     },
     "android": {
-      "package": "com.greenpulse.mobilestore",
+      "package": "com.greenline.mobilestore",
       "adaptiveIcon": {
         "backgroundColor": "#064E3B"
       },

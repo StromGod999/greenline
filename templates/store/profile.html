@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static humanize %}
 
-{% block title %}My Account & Scheduled Deliveries - GreenPulse{% endblock %}
+{% block title %}My Account & Scheduled Deliveries - Greenline{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -35,9 +35,55 @@
           </div>
         </div>
 
-        <a href="{% url 'store:logout' %}" class="btn btn-outline-danger w-100 rounded-pill btn-sm">
+        <a href="{% url 'account_logout' %}" class="btn btn-outline-danger w-100 rounded-pill btn-sm">
           <i class="fa-solid fa-right-from-bracket me-1"></i> Sign Out
         </a>
+      </div>
+
+      <!-- Account Security: Phone Verification & Two-Factor Auth -->
+      <div class="bg-white p-4 rounded-4 shadow-sm border mb-4" style="border-color: rgba(16, 185, 129, 0.25) !important;">
+        <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-shield-halved text-emerald-600 me-2"></i> Account Security</h6>
+
+        <!-- Mobile Number Verification -->
+        <div class="mb-3 pb-3 border-bottom">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="small fw-bold">Mobile Number</span>
+            {% if user.profile.phone_verified %}
+              <span class="badge bg-success">Verified</span>
+            {% else %}
+              <span class="badge bg-secondary">Not Verified</span>
+            {% endif %}
+          </div>
+
+          {% if not user.profile.phone_verified %}
+            <form method="POST" action="{% url 'store:send_phone_otp' %}" class="d-flex gap-2 mb-2">
+              {% csrf_token %}
+              <input type="tel" name="phone_number" class="form-control form-control-sm green-input" placeholder="+91 98765 43210" value="{{ user.profile.phone_number }}" required>
+              <button type="submit" class="btn btn-sm btn-emerald rounded-pill px-3 text-nowrap">Send OTP</button>
+            </form>
+            <form method="POST" action="{% url 'store:verify_phone_otp' %}" class="d-flex gap-2">
+              {% csrf_token %}
+              <input type="text" name="otp" class="form-control form-control-sm green-input" placeholder="Enter OTP" maxlength="6" required>
+              <button type="submit" class="btn btn-sm btn-outline-emerald rounded-pill px-3 text-nowrap">Verify</button>
+            </form>
+          {% else %}
+            <div class="small text-muted">{{ user.profile.phone_number }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Two-Factor Authentication Toggle -->
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="small fw-bold d-block">Email Two-Factor Login</span>
+            <span class="small text-muted">Extra login code sent to your email</span>
+          </div>
+          <form method="POST" action="{% url 'store:toggle_2fa' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm rounded-pill px-3 {% if user.profile.two_factor_enabled %}btn-emerald{% else %}btn-outline-secondary{% endif %}">
+              {% if user.profile.two_factor_enabled %}On{% else %}Off{% endif %}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
 

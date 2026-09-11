@@ -110,9 +110,9 @@ def api_home(request):
     return JsonResponse({
         'status': 'success',
         'store': {
-            'name': getattr(settings, 'STORE_NAME', 'GreenPulse Mobiles India'),
+            'name': getattr(settings, 'STORE_NAME', 'Greenline Mobiles India'),
             'phone': getattr(settings, 'STORE_PHONE', '+91 1234567890'),
-            'email': getattr(settings, 'STORE_EMAIL', 'support@greenpulsemobiles.in'),
+            'email': getattr(settings, 'STORE_EMAIL', 'support@greenlinemobiles.in'),
             'currency': getattr(settings, 'CURRENCY_SYMBOL', '₹'),
             'currency_code': getattr(settings, 'CURRENCY_CODE', 'INR'),
             'free_shipping_threshold': 25000.0,

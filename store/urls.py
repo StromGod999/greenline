@@ -37,10 +37,13 @@ urlpatterns = [
     path('admin-dashboard/product/add/', views.admin_add_product, name='admin_add_product'),
     path('admin-dashboard/product/<int:product_id>/stock/', views.admin_update_product_stock, name='admin_update_product_stock'),
 
-    # Authentication
-    path('auth/register/', views.register_view, name='register'),
-    path('auth/login/', views.login_view, name='login'),
-    path('auth/logout/', views.logout_view, name='logout'),
+    # Authentication (django-allauth handles register/login/logout/password reset
+    # at /auth/ — see mobilestore/urls.py). These cover the extra email-2FA and
+    # phone-verification steps that build on top of it.
+    path('auth/verify-2fa/', views.verify_2fa_view, name='verify_2fa'),
+    path('auth/2fa/toggle/', views.toggle_2fa_view, name='toggle_2fa'),
+    path('auth/phone/send-otp/', views.send_phone_otp_view, name='send_phone_otp'),
+    path('auth/phone/verify-otp/', views.verify_phone_otp_view, name='verify_phone_otp'),
 
     # -------------------------------------------------------------
     # REST API for Cross-Platform Mobile Application (Android & iOS)

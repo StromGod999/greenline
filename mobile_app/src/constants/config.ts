@@ -24,9 +24,9 @@ export const getApiBaseUrl = (): string => {
 export const API_BASE_URL = getApiBaseUrl();
 
 export const STORE_CONFIG = {
-  name: 'GreenPulse Mobiles India',
+  name: 'Greenline Mobiles India',
   phone: '+91 1234567890',
-  email: 'support@greenpulsemobiles.in',
+  email: 'support@greenlinemobiles.in',
   currency: '₹',
   currencyCode: 'INR',
   freeShippingThreshold: 25000,

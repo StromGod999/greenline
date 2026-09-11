@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Database Seeder Script for GreenPulse Mobile Store India
+Database Seeder Script for Greenline Mobile Store India
 Populates brands, categories, real-world flagship smartphones with Indian Rupee (₹) pricing,
 specifications, coupons, sample scheduled delivery orders, and admin/customer accounts.
 """
@@ -21,7 +21,7 @@ from store.models import (
 )
 
 def run_seed():
-    print("🌿 Starting GreenPulse Mobile Store India Database Seeder (₹ INR)...")
+    print("🌿 Starting Greenline Mobile Store India Database Seeder (₹ INR)...")
 
     # 1. Superuser & Demo User
     admin_user, created = User.objects.get_or_create(username='admin')
@@ -29,7 +29,7 @@ def run_seed():
         admin_user.set_password('admin123')
         admin_user.is_superuser = True
         admin_user.is_staff = True
-        admin_user.email = 'admin@greenpulsemobiles.in'
+        admin_user.email = 'admin@greenlinemobiles.in'
         admin_user.first_name = 'Store'
         admin_user.last_name = 'Manager'
         admin_user.save()
@@ -344,7 +344,7 @@ def run_seed():
             defaults={
                 "rating": 5,
                 "title": "Super fast delivery on scheduled time slot!",
-                "comment": f"Got my {product.name} delivered right on schedule via GreenPulse delivery slot in Mumbai. 100% authentic seal and smooth Razorpay UPI payment!",
+                "comment": f"Got my {product.name} delivered right on schedule via Greenline delivery slot in Mumbai. 100% authentic seal and smooth Razorpay UPI payment!",
                 "is_verified_buyer": True
             }
         )

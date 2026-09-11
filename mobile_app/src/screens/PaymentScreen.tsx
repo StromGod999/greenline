@@ -141,7 +141,7 @@ export const PaymentScreen: React.FC<{ navigation: any; route: any }> = ({
             <View style={styles.centerAlign}>
               <View style={styles.qrCodeBox}>
                 <Text style={styles.qrIcon}>📱</Text>
-                <Text style={styles.qrVpaText}>greenpulse.mobiles@razorpay</Text>
+                <Text style={styles.qrVpaText}>greenline.mobiles@razorpay</Text>
               </View>
 
               <Text style={styles.upiAppsTitle}>Supported Instant UPI Apps:</Text>

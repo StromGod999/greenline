@@ -34,6 +34,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
     'store.apps.StoreConfig',
 ]
 
@@ -45,8 +48,16 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 ROOT_URLCONF = 'mobilestore.urls'
@@ -136,16 +147,51 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Authentication URLs
-LOGIN_URL = 'store:login'
+LOGIN_URL = 'account_login'
 LOGIN_REDIRECT_URL = 'store:home'
 LOGOUT_REDIRECT_URL = 'store:home'
+
+# -------------------------------------------------------------
+# django-allauth: account signup / login / email verification
+# -------------------------------------------------------------
+ACCOUNT_ADAPTER = 'store.adapters.TwoFactorAccountAdapter'
+ACCOUNT_LOGIN_METHODS = {'username', 'email'}
+ACCOUNT_SIGNUP_FIELDS = ['username*', 'email*', 'password1*', 'password2*']
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+ACCOUNT_LOGOUT_ON_GET = True
+
+# -------------------------------------------------------------
+# Email delivery via Resend (SMTP relay) — used for allauth's
+# signup verification emails and for email-based 2FA login codes.
+# -------------------------------------------------------------
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
+if RESEND_API_KEY:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.resend.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = 'resend'
+    EMAIL_HOST_PASSWORD = RESEND_API_KEY
+else:
+    # No Resend key configured — fall back to printing emails to the console
+    # so signup/login still work in local development.
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Greenline Mobile Store <onboarding@resend.dev>')
+
+# -------------------------------------------------------------
+# 2Factor.in: free-tier OTP SMS API for mobile number verification
+# https://2factor.in
+# -------------------------------------------------------------
+TWOFACTOR_API_KEY = os.environ.get('TWOFACTOR_API_KEY', '')
 
 # Razorpay Configuration (Works out-of-the-box in test/mock mode or with live credentials)
 RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', 'rzp_test_TYrDpRiv6T2o3c')
 RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', 'pVtkql3mbjl5RAVSSQWivDPr')
 CURRENCY_SYMBOL = '₹'
 CURRENCY_CODE = 'INR'
-STORE_NAME = 'GreenPulse Mobiles India'
+STORE_NAME = 'Greenline Mobiles India'
 STORE_PHONE = '+91 1234567890'
-STORE_EMAIL = 'support@greenpulsemobiles.in'
+STORE_EMAIL = 'support@greenlinemobiles.in'
 

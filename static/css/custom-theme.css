@@ -1,5 +1,5 @@
 /* ==========================================================================
-   GreenPulse Mobile Store - Ultra Modern Green & White Theme
+   Greenline Mobile Store - Ultra Modern Green & White Theme
    Colors: Emerald Green (#10B981, #059669), Deep Forest (#064E3B, #022C22),
            Mint Frost (#ECFDF5, #F0FDF4), Clean White (#FFFFFF, #F8FAFC)
    ========================================================================== */
@@ -112,6 +112,17 @@ h1, h2, h3, h4, h5, h6 {
 .nav-link:hover, .nav-link.active {
   color: var(--gp-primary-dark) !important;
   background-color: var(--gp-mint-card);
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  color: #FFFFFF !important;
+  background-color: var(--gp-primary) !important;
+}
+
+.nav-pills .nav-link:not(.active):hover {
+  color: var(--gp-primary-dark) !important;
+  background-color: var(--gp-mint-card) !important;
 }
 
 /* Search bar in Navbar */
@@ -666,3 +677,62 @@ input[type="radio"]:checked + .gp-slot-card {
 .toast-container {
   z-index: 1090;
 }
+
+/* ==========================================================================
+   Order status badge colors (used via get_status_badge_class on Order)
+   ========================================================================== */
+.badge.bg-emerald-100 { background-color: #D1FAE5 !important; }
+.badge.bg-blue-100    { background-color: #DBEAFE !important; }
+.badge.bg-amber-100   { background-color: #FEF3C7 !important; }
+.badge.bg-purple-100  { background-color: #F3E8FF !important; }
+.badge.bg-teal-100    { background-color: #CCFBF1 !important; }
+.badge.bg-green-100   { background-color: #DCFCE7 !important; }
+.badge.bg-rose-100    { background-color: #FFE4E6 !important; }
+.badge.bg-slate-100   { background-color: #F1F5F9 !important; }
+
+.badge.text-emerald-800 { color: #065F46 !important; }
+.badge.text-blue-800    { color: #1E40AF !important; }
+.badge.text-amber-800   { color: #92400E !important; }
+.badge.text-purple-800  { color: #6B21A8 !important; }
+.badge.text-teal-800    { color: #115E59 !important; }
+.badge.text-green-800   { color: #166534 !important; }
+.badge.text-rose-800    { color: #9F1239 !important; }
+.badge.text-slate-800   { color: #1E293B !important; }
+
+/* ==========================================================================
+   Emerald & Slate utility scale (Tailwind-style classes used across templates
+   but not part of Bootstrap's default palette)
+   ========================================================================== */
+.text-emerald-50   { color: #ECFDF5 !important; }
+.text-emerald-100  { color: #D1FAE5 !important; }
+.text-emerald-200  { color: #A7F3D0 !important; }
+.text-emerald-300  { color: #6EE7B7 !important; }
+.text-emerald-400  { color: #34D399 !important; }
+.text-emerald-500  { color: #10B981 !important; }
+.text-emerald-600  { color: #059669 !important; }
+.text-emerald-700  { color: #047857 !important; }
+.text-emerald-800  { color: #065F46 !important; }
+.text-emerald-900  { color: #064E3B !important; }
+.text-emerald-950  { color: #022C22 !important; }
+
+.bg-emerald-50  { background-color: #ECFDF5 !important; }
+.bg-emerald-100 { background-color: #D1FAE5 !important; }
+.bg-emerald-400 { background-color: #34D399 !important; }
+.bg-emerald-500 { background-color: #10B981 !important; }
+.bg-emerald-600 { background-color: #059669 !important; }
+
+.border-emerald-300 { border-color: #6EE7B7 !important; }
+.border-emerald-600 { border-color: #059669 !important; }
+
+.text-slate-300 { color: #CBD5E1 !important; }
+.text-slate-400 { color: #94A3B8 !important; }
+.text-slate-800 { color: #1E293B !important; }
+
+.badge.border-emerald-300 { border: 1px solid #6EE7B7; }
+.badge.border-blue-300    { border: 1px solid #93C5FD; }
+.badge.border-amber-300   { border: 1px solid #FCD34D; }
+.badge.border-purple-300  { border: 1px solid #D8B4FE; }
+.badge.border-teal-300    { border: 1px solid #5EEAD4; }
+.badge.border-green-300   { border: 1px solid #86EFAC; }
+.badge.border-rose-300    { border: 1px solid #FDA4AF; }
+.badge.border-slate-300   { border: 1px solid #CBD5E1; }

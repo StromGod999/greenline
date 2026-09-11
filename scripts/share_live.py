@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Instant Shareable Link Generator for GreenPulse Mobile Store
+Instant Shareable Link Generator for Greenline Mobile Store
 Creates a public HTTPS URL using localtunnel, ngrok, or pinggy.
 """
 import subprocess
@@ -10,7 +10,7 @@ import os
 
 def main():
     print("=" * 65)
-    print("    🌿 GreenPulse Mobile Store - Live Shareable Link Generator")
+    print("    🌿 Greenline Mobile Store - Live Shareable Link Generator")
     print("=" * 65)
     print("\n👉 Ensure your Django server is running (`python manage.py runserver`)")
     print("👉 Generating your secure public HTTPS link...\n")

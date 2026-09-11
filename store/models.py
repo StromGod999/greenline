@@ -1,7 +1,10 @@
 import uuid
+from datetime import timedelta
 from decimal import Decimal
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
 
@@ -337,3 +340,56 @@ class Wishlist(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s wishlist item: {self.product.name}"
+
+
+class UserProfile(models.Model):
+    """Extends the built-in User with phone verification & 2FA preference."""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    phone_number = models.CharField(max_length=20, blank=True)
+    phone_verified = models.BooleanField(default=False)
+    two_factor_enabled = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Profile: {self.user.username}"
+
+
+class PhoneOTP(models.Model):
+    """Tracks an OTP sent via the 2Factor.in SMS API for phone verification."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='phone_otps')
+    phone_number = models.CharField(max_length=20)
+    session_id = models.CharField(max_length=100, blank=True)
+    is_used = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timedelta(minutes=10)
+
+    def __str__(self):
+        return f"Phone OTP for {self.phone_number} ({self.user.username})"
+
+
+class LoginOTP(models.Model):
+    """A one-time email code used as the second factor at login."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='login_otps')
+    code = models.CharField(max_length=6)
+    is_used = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timedelta(minutes=10)
+
+    def __str__(self):
+        return f"Login OTP for {self.user.username}"
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.get_or_create(user=instance)

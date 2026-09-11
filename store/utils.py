@@ -1,8 +1,72 @@
 import hmac
 import hashlib
+import logging
 from decimal import Decimal
+
+import requests
 from django.conf import settings
+from django.core.mail import send_mail
 from .models import Cart
+
+logger = logging.getLogger(__name__)
+
+
+def send_login_otp_email(user, code):
+    """Emails a one-time login code (2FA) to the user via the configured backend (Resend SMTP)."""
+    subject = f"Your {getattr(settings, 'STORE_NAME', 'Greenline')} login code"
+    message = (
+        f"Hi {user.first_name or user.username},\n\n"
+        f"Your one-time login verification code is: {code}\n\n"
+        f"This code expires in 10 minutes. If you did not attempt to log in, "
+        f"you can safely ignore this email.\n\n"
+        f"- {getattr(settings, 'STORE_NAME', 'Greenline Mobile Store')}"
+    )
+    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email], fail_silently=False)
+
+
+def send_phone_otp(phone_number):
+    """
+    Sends an SMS OTP to `phone_number` via the 2Factor.in free-tier API.
+    Returns (session_id, error_message).
+    """
+    api_key = getattr(settings, 'TWOFACTOR_API_KEY', '')
+    if not api_key:
+        return None, "SMS verification is not configured on this server."
+
+    clean_number = phone_number.strip().replace(' ', '')
+    if clean_number.startswith('+91'):
+        clean_number = clean_number[3:]
+    elif clean_number.startswith('91') and len(clean_number) == 12:
+        clean_number = clean_number[2:]
+
+    url = f"https://2factor.in/API/V1/{api_key}/SMS/{clean_number}/AUTOGEN"
+    try:
+        resp = requests.get(url, timeout=10)
+        data = resp.json()
+    except (requests.RequestException, ValueError) as exc:
+        logger.error("2Factor.in send OTP failed: %s", exc)
+        return None, "Could not reach the SMS provider. Please try again."
+
+    if data.get('Status') == 'Success':
+        return data.get('Details'), None
+    return None, data.get('Details', 'Failed to send OTP.')
+
+
+def verify_phone_otp_code(session_id, otp):
+    """Verifies an OTP against a 2Factor.in OTP session. Returns True/False."""
+    api_key = getattr(settings, 'TWOFACTOR_API_KEY', '')
+    if not api_key or not session_id:
+        return False
+
+    url = f"https://2factor.in/API/V1/{api_key}/SMS/VERIFY/{session_id}/{otp}"
+    try:
+        resp = requests.get(url, timeout=10)
+        data = resp.json()
+    except (requests.RequestException, ValueError) as exc:
+        logger.error("2Factor.in verify OTP failed: %s", exc)
+        return False
+
+    return data.get('Status') == 'Success'
 
 def get_or_create_cart(request):
     """

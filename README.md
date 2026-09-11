@@ -1,4 +1,4 @@
-# 📱 GreenPulse Mobile Store - Python Django E-Commerce Platform
+# 📱 Greenline Mobile Store - Python Django E-Commerce Platform
 
 A flagship, modern **Online Mobile Store** built with **Python & Django**, designed with a **Green & White luxury texture theme** (Emerald Green, Mint Frost, and Clean White), dedicated Cart management, integrated **Razorpay Secure Payment Gateway**, interactive **Order Delivery Scheduling**, and a **Custom Admin Management & Dispatch Portal**.
 

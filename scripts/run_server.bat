@@ -1,8 +1,8 @@
 @echo off
-title GreenPulse Online Mobile Store
+title Greenline Online Mobile Store
 cd /d "%~dp0.."
 echo ===============================================================
-echo     GreenPulse Mobile Store - Django Server Launcher
+echo     Greenline Mobile Store - Django Server Launcher
 echo ===============================================================
 echo.
 

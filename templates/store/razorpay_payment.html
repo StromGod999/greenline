@@ -81,7 +81,7 @@
           <i class="fa-solid fa-shield-halved fs-5"></i>
           <div>
             <div class="fw-bold">Razorpay Test Gateway (India)</div>
-            <small class="text-emerald-100" style="font-size: 0.75rem;">GreenPulse Mobile Store (₹{{ order.total_amount }})</small>
+            <small class="text-emerald-100" style="font-size: 0.75rem;">Greenline Mobile Store (₹{{ order.total_amount }})</small>
           </div>
         </div>
         <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal"></button>
@@ -132,7 +132,7 @@
               <i class="fa-solid fa-qrcode display-4 text-emerald-800"></i>
             </div>
             <div class="small fw-bold text-dark">Scan with GPay, PhonePe, Paytm, or BHIM</div>
-            <small class="text-muted font-monospace">razorpay.greenpulse@upi</small>
+            <small class="text-muted font-monospace">razorpay.greenline@upi</small>
           </div>
 
           <!-- NetBanking Tab -->
@@ -175,7 +175,7 @@ function initiatePayment() {
     key: "{{ razorpay_key_id }}",
     amount: "{{ amount_in_cents }}",
     currency: "{{ currency }}",
-    name: "GreenPulse Mobile Store",
+    name: "Greenline Mobile Store",
     description: "Payment for Order #{{ order.order_number }}",
     order_id: "{{ razorpay_order_id }}",
     order_number: "{{ order.order_number }}",

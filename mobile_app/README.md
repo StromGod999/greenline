@@ -1,4 +1,4 @@
-# 📱 GreenPulse Mobile Store - Cross-Platform Mobile App (Android & iOS)
+# 📱 Greenline Mobile Store - Cross-Platform Mobile App (Android & iOS)
 
 A complete cross-platform mobile shopping application built for **Android** and **iOS** with **Razorpay Payment Gateway Integration**, door-step delivery scheduling, and live tracking.
 

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static allauth %}
+
+{% block title %}Create Account - Greenline Mobile Store{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+
+      <div class="bg-white rounded-4 shadow-lg border p-4 p-md-5" style="border-color: rgba(16, 185, 129, 0.25) !important;">
+
+        <div class="text-center mb-4">
+          <div class="gp-brand-icon mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.6rem;">
+            <i class="fa-solid fa-user-plus"></i>
+          </div>
+          <h3 class="fw-extrabold text-dark">Create Your Account</h3>
+          <p class="text-muted small">Join Greenline for custom delivery scheduling & priority perks</p>
+        </div>
+
+        <form method="POST" action="{% url 'account_signup' %}">
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger rounded-3 small">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Username *</label>
+            <input type="text" name="username" class="form-control green-input" placeholder="johndoe" required value="{{ form.username.value|default:'' }}">
+            {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors|join:", " }}</div>{% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Email Address *</label>
+            <input type="email" name="email" class="form-control green-input" placeholder="john@example.com" required value="{{ form.email.value|default:'' }}">
+            {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors|join:", " }}</div>{% endif %}
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-6">
+              <label class="form-label small fw-bold">Password *</label>
+              <input type="password" name="password1" class="form-control green-input" placeholder="••••••••" required>
+              {% if form.password1.errors %}<div class="text-danger small mt-1">{{ form.password1.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold">Confirm Password *</label>
+              <input type="password" name="password2" class="form-control green-input" placeholder="••••••••" required>
+              {% if form.password2.errors %}<div class="text-danger small mt-1">{{ form.password2.errors|join:", " }}</div>{% endif %}
+            </div>
+          </div>
+
+          {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+          {% endif %}
+
+          <button type="submit" class="btn btn-emerald btn-lg w-100 rounded-pill shadow-sm mb-3">
+            <i class="fa-solid fa-check me-2"></i> Register Account
+          </button>
+        </form>
+
+        <div class="text-center small">
+          Already have an account? <a href="{% url 'account_login' %}" class="text-emerald-700 fw-bold text-decoration-none">Sign In</a>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

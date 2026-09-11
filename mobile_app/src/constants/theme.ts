@@ -1,5 +1,5 @@
 /**
- * GreenPulse Mobile Store - Green & White Palette & Design System
+ * Greenline Mobile Store - Green & White Palette & Design System
  */
 export const Colors = {
   // Primary Greens

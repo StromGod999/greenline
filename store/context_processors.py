@@ -30,8 +30,8 @@ def store_context(request):
         'cart_count': cart_count,
         'cart_subtotal': cart_subtotal,
         'CURRENCY_SYMBOL': getattr(settings, 'CURRENCY_SYMBOL', '$'),
-        'STORE_NAME': getattr(settings, 'STORE_NAME', 'GreenPulse Mobile Store'),
+        'STORE_NAME': getattr(settings, 'STORE_NAME', 'Greenline Mobile Store'),
         'STORE_PHONE': getattr(settings, 'STORE_PHONE', '+1 (800) 555-MOBI'),
-        'STORE_EMAIL': getattr(settings, 'STORE_EMAIL', 'support@greenpulsemobiles.com'),
+        'STORE_EMAIL': getattr(settings, 'STORE_EMAIL', 'support@greenlinemobiles.com'),
         'RAZORPAY_KEY_ID': getattr(settings, 'RAZORPAY_KEY_ID', 'rzp_test_GreenMobileStoreKey'),
     }

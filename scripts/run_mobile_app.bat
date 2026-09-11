@@ -1,9 +1,9 @@
 @echo off
-title GreenPulse Mobile App (Android & iOS Launcher)
+title Greenline Mobile App (Android & iOS Launcher)
 color 0A
 
 echo ============================================================
-echo   GreenPulse Mobiles India - Mobile App Launcher
+echo   Greenline Mobiles India - Mobile App Launcher
 echo   Cross-Platform: Android APK / Simulator ^& iOS
 echo ============================================================
 echo.
